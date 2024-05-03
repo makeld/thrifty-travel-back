@@ -1,0 +1,41 @@
+namespace Domain.Enums
+{
+    public enum ETripCategory
+    {
+        Backpacking,
+        Camping,
+        Ecotourism,
+        Hostelling,
+        RoadTrip,
+        Volunteer,
+        Culinary,
+        Cultural,
+        FoodAndDrink,
+        Heritage,
+        Hiking,
+        SpaAndWellness,
+        UrbanExploration,
+        Cruise,
+        Glamping,
+        Luxury,
+        Safari,
+        Yacht,
+        Group,
+        Solo,
+        Couple,
+        Family,
+        Adventure,
+        Business,
+        Festival,
+        HealthAndFitness,
+        Historic,
+        IslandHopping,
+        Pilgrimage,
+        Rural,
+        Skiing,
+        Sports,
+        TrainJourney,
+        Nature,
+        Honeymoon
+    }
+}
