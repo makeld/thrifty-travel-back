@@ -21,14 +21,14 @@ namespace WebApp.ApiControllers
             _context = context;
         }
 
-        // GET: api/Photos
+        // GET: api/PhotoService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos()
         {
             return await _context.Photos.ToListAsync();
         }
 
-        // GET: api/Photos/5
+        // GET: api/PhotoService/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Photo>> GetPhoto(Guid id)
         {
@@ -42,7 +42,7 @@ namespace WebApp.ApiControllers
             return photo;
         }
 
-        // PUT: api/Photos/5
+        // PUT: api/PhotoService/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPhoto(Guid id, Photo photo)
@@ -73,7 +73,7 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        // POST: api/Photos
+        // POST: api/PhotoService
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Photo>> PostPhoto(Photo photo)
@@ -84,7 +84,7 @@ namespace WebApp.ApiControllers
             return CreatedAtAction("GetPhoto", new { id = photo.Id }, photo);
         }
 
-        // DELETE: api/Photos/5
+        // DELETE: api/PhotoService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePhoto(Guid id)
         {

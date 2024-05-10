@@ -5,6 +5,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0_SolutionItems", "0_Soluti
 		..\README.md = ..\README.md
 		docker-compose.yml = docker-compose.yml
 		Directory.Build.props = Directory.Build.props
+		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App.Domain", "App.Domain\App.Domain.csproj", "{8023EAAB-FA5F-48B8-B711-830FFC18924D}"

@@ -78,6 +78,11 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwa
 
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAutoMapper(
+    typeof(App.DAL.EF.AutoMapperProfile),
+    typeof(App.BLL.AutoMapperProfile),
+    typeof(WebApp.Helpers.AutoMapperProfile));
+
 var app = builder.Build();
 
 

@@ -19,14 +19,14 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: Expenses
+        // GET: ExpenseService
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.Expenses.Include(e => e.Trip).Include(e => e.TripLocation);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Expenses/Details/5
+        // GET: ExpenseService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -46,7 +46,7 @@ namespace WebApp.Controllers
             return View(expense);
         }
 
-        // GET: Expenses/Create
+        // GET: ExpenseService/Create
         public IActionResult Create()
         {
             ViewData["TripId"] = new SelectList(_context.Trips, "Id", "Title");
@@ -54,7 +54,7 @@ namespace WebApp.Controllers
             return View();
         }
 
-        // POST: Expenses/Create
+        // POST: ExpenseService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -73,7 +73,7 @@ namespace WebApp.Controllers
             return View(expense);
         }
 
-        // GET: Expenses/Edit/5
+        // GET: ExpenseService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -91,7 +91,7 @@ namespace WebApp.Controllers
             return View(expense);
         }
 
-        // POST: Expenses/Edit/5
+        // POST: ExpenseService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -128,7 +128,7 @@ namespace WebApp.Controllers
             return View(expense);
         }
 
-        // GET: Expenses/Delete/5
+        // GET: ExpenseService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -148,7 +148,7 @@ namespace WebApp.Controllers
             return View(expense);
         }
 
-        // POST: Expenses/Delete/5
+        // POST: ExpenseService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

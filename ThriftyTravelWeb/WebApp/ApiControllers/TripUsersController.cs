@@ -21,14 +21,14 @@ namespace WebApp.ApiControllers
             _context = context;
         }
 
-        // GET: api/TripUsers
+        // GET: api/TripUserService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TripUser>>> GetTripUsers()
         {
             return await _context.TripUsers.ToListAsync();
         }
 
-        // GET: api/TripUsers/5
+        // GET: api/TripUserService/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TripUser>> GetTripUser(Guid id)
         {
@@ -42,7 +42,7 @@ namespace WebApp.ApiControllers
             return tripUser;
         }
 
-        // PUT: api/TripUsers/5
+        // PUT: api/TripUserService/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTripUser(Guid id, TripUser tripUser)
@@ -73,7 +73,7 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        // POST: api/TripUsers
+        // POST: api/TripUserService
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<TripUser>> PostTripUser(TripUser tripUser)
@@ -84,7 +84,7 @@ namespace WebApp.ApiControllers
             return CreatedAtAction("GetTripUser", new { id = tripUser.Id }, tripUser);
         }
 
-        // DELETE: api/TripUsers/5
+        // DELETE: api/TripUserService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTripUser(Guid id)
         {

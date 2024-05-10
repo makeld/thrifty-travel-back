@@ -19,14 +19,14 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: TripUsers
+        // GET: TripUserService
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.TripUsers.Include(t => t.AppUser).Include(t => t.Trip);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: TripUsers/Details/5
+        // GET: TripUserService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -46,7 +46,7 @@ namespace WebApp.Controllers
             return View(tripUser);
         }
 
-        // GET: TripUsers/Create
+        // GET: TripUserService/Create
         public IActionResult Create()
         {
             ViewData["AppUserId"] = new SelectList(_context.AppUsers, "Id", "FirstName");
@@ -54,7 +54,7 @@ namespace WebApp.Controllers
             return View();
         }
 
-        // POST: TripUsers/Create
+        // POST: TripUserService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -73,7 +73,7 @@ namespace WebApp.Controllers
             return View(tripUser);
         }
 
-        // GET: TripUsers/Edit/5
+        // GET: TripUserService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -91,7 +91,7 @@ namespace WebApp.Controllers
             return View(tripUser);
         }
 
-        // POST: TripUsers/Edit/5
+        // POST: TripUserService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -128,7 +128,7 @@ namespace WebApp.Controllers
             return View(tripUser);
         }
 
-        // GET: TripUsers/Delete/5
+        // GET: TripUserService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -148,7 +148,7 @@ namespace WebApp.Controllers
             return View(tripUser);
         }
 
-        // POST: TripUsers/Delete/5
+        // POST: TripUserService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

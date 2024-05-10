@@ -17,4 +17,9 @@ public abstract class BaseUnitOfWork<TAppDbContext> : IUnitOfWork
     {
         return await UowDbContext.SaveChangesAsync();
     }
+    
+    public int SaveChanges()
+    {
+        return UowDbContext.SaveChanges();
+    }
 }

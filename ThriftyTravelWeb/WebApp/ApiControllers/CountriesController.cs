@@ -21,14 +21,14 @@ namespace WebApp.ApiControllers
             _context = context;
         }
 
-        // GET: api/Countries
+        // GET: api/CountryService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
         {
             return await _context.Countries.ToListAsync();
         }
 
-        // GET: api/Countries/5
+        // GET: api/CountryService/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Country>> GetCountry(Guid id)
         {
@@ -42,7 +42,7 @@ namespace WebApp.ApiControllers
             return country;
         }
 
-        // PUT: api/Countries/5
+        // PUT: api/CountryService/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCountry(Guid id, Country country)
@@ -73,7 +73,7 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        // POST: api/Countries
+        // POST: api/CountryService
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Country>> PostCountry(Country country)
@@ -84,7 +84,7 @@ namespace WebApp.ApiControllers
             return CreatedAtAction("GetCountry", new { id = country.Id }, country);
         }
 
-        // DELETE: api/Countries/5
+        // DELETE: api/CountryService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCountry(Guid id)
         {

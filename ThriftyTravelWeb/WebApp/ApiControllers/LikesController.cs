@@ -21,14 +21,14 @@ namespace WebApp.ApiControllers
             _context = context;
         }
 
-        // GET: api/Likes
+        // GET: api/LikeService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Like>>> GetLikes()
         {
             return await _context.Likes.ToListAsync();
         }
 
-        // GET: api/Likes/5
+        // GET: api/LikeService/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Like>> GetLike(Guid id)
         {
@@ -42,7 +42,7 @@ namespace WebApp.ApiControllers
             return like;
         }
 
-        // PUT: api/Likes/5
+        // PUT: api/LikeService/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLike(Guid id, Like like)
@@ -73,7 +73,7 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        // POST: api/Likes
+        // POST: api/LikeService
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Like>> PostLike(Like like)
@@ -84,7 +84,7 @@ namespace WebApp.ApiControllers
             return CreatedAtAction("GetLike", new { id = like.Id }, like);
         }
 
-        // DELETE: api/Likes/5
+        // DELETE: api/LikeService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLike(Guid id)
         {

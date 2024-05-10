@@ -19,13 +19,13 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: Trips
+        // GET: TripService
         public async Task<IActionResult> Index()
         {
             return View(await _context.Trips.ToListAsync());
         }
 
-        // GET: Trips/Details/5
+        // GET: TripService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -43,13 +43,13 @@ namespace WebApp.Controllers
             return View(trip);
         }
 
-        // GET: Trips/Create
+        // GET: TripService/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Trips/Create
+        // POST: TripService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -66,7 +66,7 @@ namespace WebApp.Controllers
             return View(trip);
         }
 
-        // GET: Trips/Edit/5
+        // GET: TripService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -82,7 +82,7 @@ namespace WebApp.Controllers
             return View(trip);
         }
 
-        // POST: Trips/Edit/5
+        // POST: TripService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -117,7 +117,7 @@ namespace WebApp.Controllers
             return View(trip);
         }
 
-        // GET: Trips/Delete/5
+        // GET: TripService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -135,7 +135,7 @@ namespace WebApp.Controllers
             return View(trip);
         }
 
-        // POST: Trips/Delete/5
+        // POST: TripService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

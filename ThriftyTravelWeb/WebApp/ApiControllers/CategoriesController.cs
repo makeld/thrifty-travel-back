@@ -1,11 +1,13 @@
 using System.Net;
+using App.Contracts.BLL;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using App.DAL.EF;
 using Asp.Versioning;
-using Domain.Entities;
+using AutoMapper;
+using Domain.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
 {
@@ -16,86 +18,104 @@ namespace WebApp.ApiControllers
 
     public class CategoriesController : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public CategoriesController(AppDbContext context)
+        private readonly IAppBLL _bll;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly PublicDTOBllMapper<App.DTO.v1_0.Category, App.BLL.DTO.Category> _mapper;
+        
+        
+        public CategoriesController(IAppBLL bll, UserManager<AppUser> userManager,
+            IMapper autoMapper)
         {
-            _context = context;
+            _bll = bll;
+            _userManager = userManager;
+            _mapper = new PublicDTOBllMapper<App.DTO.v1_0.Category, App.BLL.DTO.Category>(autoMapper);
         }
+
         
         /// <summary>
-        /// Return all categories visible to current user
+        /// Return all categories
         /// </summary>
-        /// <returns>list of Categories</returns>
+        /// <returns>List of Categories</returns>
         [HttpGet]
-        [ProducesResponseType<IEnumerable<Category>>((int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(List<App.DTO.v1_0.Category>), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<ActionResult<List<App.DTO.v1_0.Category>>> GetCategories()
         {
-            return await _context.Categories.ToListAsync();
+            var bllCategoriesResult = await _bll.CategoryService.GetAllAsync();
+            var bllCategories = bllCategoriesResult.Select(e => _mapper.Map(e)).ToList();
+            return Ok(bllCategories);
         }
 
-        // GET: api/Categories/5
+
+        /// <summary>
+        /// Return Category by its ID
+        /// </summary>
+        /// <param name="id">Category ID</param>
+        /// <returns>Category</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> GetCategory(Guid id)
+        [ProducesResponseType(typeof(App.DTO.v1_0.Category), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Category>> GetCategory(Guid id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _bll.CategoryService.FirstOrDefaultAsync(id);
 
             if (category == null)
             {
                 return NotFound();
             }
 
-            return category;
+            var res = _mapper.Map(category);
+
+            return Ok(res);
         }
 
-        // PUT: api/Categories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Update Category
+        /// </summary>
+        /// <param name="id">Category ID</param>
+        /// <param name="category">Category</param>
+        /// <returns>NoContent</returns>
         [HttpPut("{id}")]
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        public async Task<IActionResult> PutCategory(Guid id, Category category)
+        public async Task<IActionResult> PutCategory(Guid id, App.BLL.DTO.Category category)
         {
             if (id != category.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID in the URL does not match the ID in the category data.");
             }
 
-            _context.Entry(category).State = EntityState.Modified;
-
-            try
+            if (!await _bll.CategoryService.ExistsAsync(id))
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CategoryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound("The category with the specified ID does not exist.");
             }
 
+            _bll.CategoryService.Update(category);
+            
             return NoContent();
         }
         
 
+        /// <summary>
+        /// Create new Category
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns>NoContent</returns>
         [HttpPost]
-        [ProducesResponseType<Category>((int) HttpStatusCode.Created)]
+        [ProducesResponseType<App.DTO.v1_0.Category>((int) HttpStatusCode.Created)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
+        public async Task<ActionResult<App.DTO.v1_0.Category>> PostCategory(App.DTO.v1_0.Category category)
         {
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
+            var mappedCategory = _mapper.Map(category);
+            _bll.CategoryService.Add(mappedCategory);
 
             return CreatedAtAction("GetCategory", new
             {
@@ -104,7 +124,11 @@ namespace WebApp.ApiControllers
             }, category);
         }
 
-        // DELETE: api/Categories/5
+        /// <summary>
+        /// Delete Category by ID
+        /// </summary>
+        /// <param name="id">Category ID</param>
+        /// <returns>NoContent</returns>
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
         [HttpDelete("{id}")]
@@ -112,21 +136,31 @@ namespace WebApp.ApiControllers
         [Consumes("application/json")]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _bll.CategoryService.FirstOrDefaultAsync(id);
             if (category == null)
             {
                 return NotFound();
             }
 
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            await _bll.CategoryService.RemoveAsync(id);
 
             return NoContent();
         }
 
+        
+        /// <summary>
+        /// Check if Category exists
+        /// </summary>
+        /// <param name="id">Category ID</param>
+        /// <returns>bool</returns>
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         private bool CategoryExists(Guid id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _bll.CategoryService.Exists(id);
         }
     }
 }

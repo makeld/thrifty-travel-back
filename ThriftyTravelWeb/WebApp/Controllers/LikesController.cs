@@ -19,14 +19,14 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: Likes
+        // GET: LikeService
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.Likes.Include(l => l.AppUser).Include(l => l.Trip);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Likes/Details/5
+        // GET: LikeService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -46,7 +46,7 @@ namespace WebApp.Controllers
             return View(like);
         }
 
-        // GET: Likes/Create
+        // GET: LikeService/Create
         public IActionResult Create()
         {
             ViewData["AppUserId"] = new SelectList(_context.AppUsers, "Id", "FirstName");
@@ -54,7 +54,7 @@ namespace WebApp.Controllers
             return View();
         }
 
-        // POST: Likes/Create
+        // POST: LikeService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -73,7 +73,7 @@ namespace WebApp.Controllers
             return View(like);
         }
 
-        // GET: Likes/Edit/5
+        // GET: LikeService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -91,7 +91,7 @@ namespace WebApp.Controllers
             return View(like);
         }
 
-        // POST: Likes/Edit/5
+        // POST: LikeService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -128,7 +128,7 @@ namespace WebApp.Controllers
             return View(like);
         }
 
-        // GET: Likes/Delete/5
+        // GET: LikeService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -148,7 +148,7 @@ namespace WebApp.Controllers
             return View(like);
         }
 
-        // POST: Likes/Delete/5
+        // POST: LikeService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

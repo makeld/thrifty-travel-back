@@ -19,14 +19,14 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: Comments
+        // GET: CommentService
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.Comments.Include(c => c.AppUser).Include(c => c.ParentComment).Include(c => c.Trip);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Comments/Details/5
+        // GET: CommentService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -47,7 +47,7 @@ namespace WebApp.Controllers
             return View(comment);
         }
 
-        // GET: Comments/Create
+        // GET: CommentService/Create
         public IActionResult Create()
         {
             ViewData["AppUserId"] = new SelectList(_context.AppUsers, "Id", "FirstName");
@@ -56,7 +56,7 @@ namespace WebApp.Controllers
             return View();
         }
 
-        // POST: Comments/Create
+        // POST: CommentService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -76,7 +76,7 @@ namespace WebApp.Controllers
             return View(comment);
         }
 
-        // GET: Comments/Edit/5
+        // GET: CommentService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -95,7 +95,7 @@ namespace WebApp.Controllers
             return View(comment);
         }
 
-        // POST: Comments/Edit/5
+        // POST: CommentService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -133,7 +133,7 @@ namespace WebApp.Controllers
             return View(comment);
         }
 
-        // GET: Comments/Delete/5
+        // GET: CommentService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -154,7 +154,7 @@ namespace WebApp.Controllers
             return View(comment);
         }
 
-        // POST: Comments/Delete/5
+        // POST: CommentService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

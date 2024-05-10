@@ -17,5 +17,5 @@ public class Comment : BaseEntityId, IDomainAppUser<AppUser>
 
     public string Content { get; set; } = default!;
     
-    public ICollection<Comment>? ChildComments { get; set; } = new List<Comment>();
+    public ICollection<Comment>? ChildComments { get; set; }
 }

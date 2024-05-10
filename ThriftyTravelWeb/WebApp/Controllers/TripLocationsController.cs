@@ -19,14 +19,14 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: TripLocations
+        // GET: TripLocationService
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.TripLocations.Include(t => t.Location).Include(t => t.Trip);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: TripLocations/Details/5
+        // GET: TripLocationService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -46,7 +46,7 @@ namespace WebApp.Controllers
             return View(tripLocation);
         }
 
-        // GET: TripLocations/Create
+        // GET: TripLocationService/Create
         public IActionResult Create()
         {
             ViewData["LocationId"] = new SelectList(_context.Locations, "Id", "LocationName");
@@ -54,7 +54,7 @@ namespace WebApp.Controllers
             return View();
         }
 
-        // POST: TripLocations/Create
+        // POST: TripLocationService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -73,7 +73,7 @@ namespace WebApp.Controllers
             return View(tripLocation);
         }
 
-        // GET: TripLocations/Edit/5
+        // GET: TripLocationService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -91,7 +91,7 @@ namespace WebApp.Controllers
             return View(tripLocation);
         }
 
-        // POST: TripLocations/Edit/5
+        // POST: TripLocationService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -128,7 +128,7 @@ namespace WebApp.Controllers
             return View(tripLocation);
         }
 
-        // GET: TripLocations/Delete/5
+        // GET: TripLocationService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -148,7 +148,7 @@ namespace WebApp.Controllers
             return View(tripLocation);
         }
 
-        // POST: TripLocations/Delete/5
+        // POST: TripLocationService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

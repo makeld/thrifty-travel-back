@@ -4,7 +4,7 @@ using Base.Contracts.DAL;
 
 namespace App.Contracts.BLL.Services;
 
-public interface ITripService : IEntityRepository<Trip>, ITripRepositoryCustom<Trip>
+public interface ITripService : IEntityRepository<Trip>
 {
     
 }

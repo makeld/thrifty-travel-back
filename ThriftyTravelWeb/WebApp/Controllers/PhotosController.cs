@@ -19,14 +19,14 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: Photos
+        // GET: PhotoService
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.Photos.Include(p => p.Expense).Include(p => p.Trip);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Photos/Details/5
+        // GET: PhotoService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -46,7 +46,7 @@ namespace WebApp.Controllers
             return View(photo);
         }
 
-        // GET: Photos/Create
+        // GET: PhotoService/Create
         public IActionResult Create()
         {
             ViewData["ExpenseId"] = new SelectList(_context.Expenses, "Id", "CurrencyCode");
@@ -54,7 +54,7 @@ namespace WebApp.Controllers
             return View();
         }
 
-        // POST: Photos/Create
+        // POST: PhotoService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -73,7 +73,7 @@ namespace WebApp.Controllers
             return View(photo);
         }
 
-        // GET: Photos/Edit/5
+        // GET: PhotoService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -91,7 +91,7 @@ namespace WebApp.Controllers
             return View(photo);
         }
 
-        // POST: Photos/Edit/5
+        // POST: PhotoService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -128,7 +128,7 @@ namespace WebApp.Controllers
             return View(photo);
         }
 
-        // GET: Photos/Delete/5
+        // GET: PhotoService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -148,7 +148,7 @@ namespace WebApp.Controllers
             return View(photo);
         }
 
-        // POST: Photos/Delete/5
+        // POST: PhotoService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

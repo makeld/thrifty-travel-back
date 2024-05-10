@@ -21,14 +21,14 @@ namespace WebApp.ApiControllers
             _context = context;
         }
 
-        // GET: api/TripCategories
+        // GET: api/TripCategoryService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TripCategory>>> GetTripCategories()
         {
             return await _context.TripCategories.ToListAsync();
         }
 
-        // GET: api/TripCategories/5
+        // GET: api/TripCategoryService/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TripCategory>> GetTripCategory(Guid id)
         {
@@ -42,7 +42,7 @@ namespace WebApp.ApiControllers
             return tripCategory;
         }
 
-        // PUT: api/TripCategories/5
+        // PUT: api/TripCategoryService/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTripCategory(Guid id, TripCategory tripCategory)
@@ -73,7 +73,7 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        // POST: api/TripCategories
+        // POST: api/TripCategoryService
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<TripCategory>> PostTripCategory(TripCategory tripCategory)
@@ -84,7 +84,7 @@ namespace WebApp.ApiControllers
             return CreatedAtAction("GetTripCategory", new { id = tripCategory.Id }, tripCategory);
         }
 
-        // DELETE: api/TripCategories/5
+        // DELETE: api/TripCategoryService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTripCategory(Guid id)
         {

@@ -39,6 +39,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\App.BLL\App.BLL.csproj" />
       <ProjectReference Include="..\App.Contracts.BLL\App.Contracts.BLL.csproj" />
       <ProjectReference Include="..\App.DAL.EF\App.DAL.EF.csproj" />
       <ProjectReference Include="..\App.DAL.DTO\App.DAL.DTO.csproj" />

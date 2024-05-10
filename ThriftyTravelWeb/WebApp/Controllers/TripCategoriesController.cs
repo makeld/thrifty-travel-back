@@ -19,14 +19,14 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: TripCategories
+        // GET: TripCategoryService
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.TripCategories.Include(t => t.Category).Include(t => t.Trip);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: TripCategories/Details/5
+        // GET: TripCategoryService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -46,7 +46,7 @@ namespace WebApp.Controllers
             return View(tripCategory);
         }
 
-        // GET: TripCategories/Create
+        // GET: TripCategoryService/Create
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
@@ -54,7 +54,7 @@ namespace WebApp.Controllers
             return View();
         }
 
-        // POST: TripCategories/Create
+        // POST: TripCategoryService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -73,7 +73,7 @@ namespace WebApp.Controllers
             return View(tripCategory);
         }
 
-        // GET: TripCategories/Edit/5
+        // GET: TripCategoryService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -91,7 +91,7 @@ namespace WebApp.Controllers
             return View(tripCategory);
         }
 
-        // POST: TripCategories/Edit/5
+        // POST: TripCategoryService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -128,7 +128,7 @@ namespace WebApp.Controllers
             return View(tripCategory);
         }
 
-        // GET: TripCategories/Delete/5
+        // GET: TripCategoryService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -148,7 +148,7 @@ namespace WebApp.Controllers
             return View(tripCategory);
         }
 
-        // POST: TripCategories/Delete/5
+        // POST: TripCategoryService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

@@ -21,14 +21,14 @@ namespace WebApp.ApiControllers
             _context = context;
         }
 
-        // GET: api/Locations
+        // GET: api/LocationService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Location>>> GetLocations()
         {
             return await _context.Locations.ToListAsync();
         }
 
-        // GET: api/Locations/5
+        // GET: api/LocationService/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Location>> GetLocation(Guid id)
         {
@@ -42,7 +42,7 @@ namespace WebApp.ApiControllers
             return location;
         }
 
-        // PUT: api/Locations/5
+        // PUT: api/LocationService/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutLocation(Guid id, Location location)
@@ -73,7 +73,7 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        // POST: api/Locations
+        // POST: api/LocationService
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Location>> PostLocation(Location location)
@@ -84,7 +84,7 @@ namespace WebApp.ApiControllers
             return CreatedAtAction("GetLocation", new { id = location.Id }, location);
         }
 
-        // DELETE: api/Locations/5
+        // DELETE: api/LocationService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLocation(Guid id)
         {

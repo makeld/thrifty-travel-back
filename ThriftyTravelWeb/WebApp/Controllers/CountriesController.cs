@@ -19,13 +19,13 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: Countries
+        // GET: CountryService
         public async Task<IActionResult> Index()
         {
             return View(await _context.Countries.ToListAsync());
         }
 
-        // GET: Countries/Details/5
+        // GET: CountryService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -43,13 +43,13 @@ namespace WebApp.Controllers
             return View(country);
         }
 
-        // GET: Countries/Create
+        // GET: CountryService/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Countries/Create
+        // POST: CountryService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -66,7 +66,7 @@ namespace WebApp.Controllers
             return View(country);
         }
 
-        // GET: Countries/Edit/5
+        // GET: CountryService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -82,7 +82,7 @@ namespace WebApp.Controllers
             return View(country);
         }
 
-        // POST: Countries/Edit/5
+        // POST: CountryService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -117,7 +117,7 @@ namespace WebApp.Controllers
             return View(country);
         }
 
-        // GET: Countries/Delete/5
+        // GET: CountryService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -135,7 +135,7 @@ namespace WebApp.Controllers
             return View(country);
         }
 
-        // POST: Countries/Delete/5
+        // POST: CountryService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

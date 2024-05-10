@@ -1,127 +1,162 @@
 using System.Net;
 using App.Contracts.BLL;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using App.DAL.EF;
+using Asp.Versioning;
 using AutoMapper;
-using Domain.Entities;
 using Domain.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TripsController : ControllerBase
     {
-        private readonly AppDbContext _context;
         private readonly IAppBLL _bll;
         private readonly UserManager<AppUser> _userManager;
         private readonly PublicDTOBllMapper<App.DTO.v1_0.Trip, App.BLL.DTO.Trip> _mapper;
 
-        public TripsController(AppDbContext context, IAppBLL bll, UserManager<AppUser> userManager, IMapper autoMapper)
+        public TripsController(IAppBLL bll, UserManager<AppUser> userManager, IMapper autoMapper)
         {
-            _context = context;
             _bll = bll;
             _userManager = userManager;
             _mapper = new PublicDTOBllMapper<App.DTO.v1_0.Trip, App.BLL.DTO.Trip>(autoMapper);
         }
 
-        // GET: api/Trips
+        
         /// <summary>
-        /// Return all trips visible to current user.
+        /// Return all trips
         /// </summary>
-        /// <returns>IEnumerable<App.DTO.v1_0.Trip></returns>
+        /// <returns>List of Trips</returns>
         [HttpGet]
-        [ProducesResponseType<IEnumerable<App.BLL.DTO.Trip>>((int) HttpStatusCode.OK)]
-        // [ProducesResponseType((int) HttpStatusCode.Unauthorized)]
+        [ProducesResponseType(typeof(List<App.DTO.v1_0.Trip>), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        public async Task<ActionResult<IEnumerable<App.DTO.v1_0.Trip>>> GetTrips()
+        public async Task<ActionResult<List<App.DTO.v1_0.Trip>>> GetTrips()
         {
-            var res = (await _bll.Trips.GetAllSortedAsync(
-                Guid.Parse(_userManager.GetUserId(User))
-                ))
-                .Select(e => _mapper.Map(e));
-            return Ok(res);
+            var bllTripsResult = await _bll.TripService.GetAllAsync();
+            var bllTrips = bllTripsResult.Select(e => _mapper.Map(e)).ToList();
+            return Ok(bllTrips);
         }
 
-        // GET: api/Trips/5
+        /// <summary>
+        /// Return Trip by its ID
+        /// </summary>
+        /// <param name="id">Trip ID</param>
+        /// <returns>Trip</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Trip>> GetTrip(Guid id)
+        [ProducesResponseType(typeof(App.DTO.v1_0.Trip), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Trip>> GetTrip(Guid id)
         {
-            var trip = await _context.Trips.FindAsync(id);
+            var trip = await _bll.TripService.FirstOrDefaultAsync(id);
 
             if (trip == null)
             {
                 return NotFound();
             }
 
-            return trip;
-        }
+            var res = _mapper.Map(trip);
 
-        // PUT: api/Trips/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+            return Ok(res);
+        }
+        
+        
+        /// <summary>
+        /// Update Trip
+        /// </summary>
+        /// <param name="id">Trip ID</param>
+        /// <param name="trip">Trip</param>
+        /// <returns>NoContent</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTrip(Guid id, Trip trip)
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<IActionResult> PutTrip(Guid id, App.BLL.DTO.Trip trip)
         {
             if (id != trip.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID in the URL does not match the ID in the trip data.");
             }
 
-            _context.Entry(trip).State = EntityState.Modified;
-
-            try
+            if (!await _bll.TripService.ExistsAsync(id))
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TripExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound("The trip with the specified ID does not exist.");
             }
 
+            _bll.TripService.Update(trip);
+            
             return NoContent();
         }
 
-        // POST: api/Trips
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Create new Trip
+        /// </summary>
+        /// <param name="trip">Trip</param>
+        /// <returns>NoContent</returns>
         [HttpPost]
-        public async Task<ActionResult<Trip>> PostTrip(Trip trip)
+        [ProducesResponseType<App.DTO.v1_0.Trip>((int) HttpStatusCode.Created)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Trip>> PostTrip(App.DTO.v1_0.Trip trip)
         {
-            _context.Trips.Add(trip);
-            await _context.SaveChangesAsync();
+            var mappedTrip = _mapper.Map(trip);
+            _bll.TripService.Add(mappedTrip);
 
-            return CreatedAtAction("GetTrip", new { id = trip.Id }, trip);
+            return CreatedAtAction("GetTrip", new
+            {
+                version = HttpContext.GetRequestedApiVersion()?.ToString(),
+                id = trip.Id
+            }, trip);
         }
 
-        // DELETE: api/Trips/5
+        /// <summary>
+        /// Delete Trip by ID
+        /// </summary>
+        /// <param name="id">Trip ID</param>
+        /// <returns>NoContent</returns>
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
         [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         public async Task<IActionResult> DeleteTrip(Guid id)
         {
-            var trip = await _context.Trips.FindAsync(id);
+            var trip = await _bll.TripService.FirstOrDefaultAsync(id);
             if (trip == null)
             {
                 return NotFound();
             }
 
-            _context.Trips.Remove(trip);
-            await _context.SaveChangesAsync();
+            await _bll.TripService.RemoveAsync(id);
 
             return NoContent();
         }
 
+        
+        /// <summary>
+        /// Check if Trip exists
+        /// </summary>
+        /// <param name="id">Trip ID</param>
+        /// <returns>bool</returns>
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         private bool TripExists(Guid id)
         {
-            return _context.Trips.Any(e => e.Id == id);
+            return _bll.TripService.Exists(id);
         }
     }
 }

@@ -21,14 +21,14 @@ namespace WebApp.ApiControllers
             _context = context;
         }
 
-        // GET: api/TripLocations
+        // GET: api/TripLocationService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TripLocation>>> GetTripLocations()
         {
             return await _context.TripLocations.ToListAsync();
         }
 
-        // GET: api/TripLocations/5
+        // GET: api/TripLocationService/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TripLocation>> GetTripLocation(Guid id)
         {
@@ -42,7 +42,7 @@ namespace WebApp.ApiControllers
             return tripLocation;
         }
 
-        // PUT: api/TripLocations/5
+        // PUT: api/TripLocationService/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTripLocation(Guid id, TripLocation tripLocation)
@@ -73,7 +73,7 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        // POST: api/TripLocations
+        // POST: api/TripLocationService
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<TripLocation>> PostTripLocation(TripLocation tripLocation)
@@ -84,7 +84,7 @@ namespace WebApp.ApiControllers
             return CreatedAtAction("GetTripLocation", new { id = tripLocation.Id }, tripLocation);
         }
 
-        // DELETE: api/TripLocations/5
+        // DELETE: api/TripLocationService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTripLocation(Guid id)
         {

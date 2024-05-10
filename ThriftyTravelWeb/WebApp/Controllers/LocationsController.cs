@@ -19,14 +19,14 @@ namespace WebApp.Controllers
             _context = context;
         }
 
-        // GET: Locations
+        // GET: LocationService
         public async Task<IActionResult> Index()
         {
             var appDbContext = _context.Locations.Include(l => l.Country);
             return View(await appDbContext.ToListAsync());
         }
 
-        // GET: Locations/Details/5
+        // GET: LocationService/Details/5
         public async Task<IActionResult> Details(Guid? id)
         {
             if (id == null)
@@ -45,14 +45,14 @@ namespace WebApp.Controllers
             return View(location);
         }
 
-        // GET: Locations/Create
+        // GET: LocationService/Create
         public IActionResult Create()
         {
             ViewData["CountryId"] = new SelectList(_context.Countries, "Id", "Id");
             return View();
         }
 
-        // POST: Locations/Create
+        // POST: LocationService/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -70,7 +70,7 @@ namespace WebApp.Controllers
             return View(location);
         }
 
-        // GET: Locations/Edit/5
+        // GET: LocationService/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -87,7 +87,7 @@ namespace WebApp.Controllers
             return View(location);
         }
 
-        // POST: Locations/Edit/5
+        // POST: LocationService/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -123,7 +123,7 @@ namespace WebApp.Controllers
             return View(location);
         }
 
-        // GET: Locations/Delete/5
+        // GET: LocationService/Delete/5
         public async Task<IActionResult> Delete(Guid? id)
         {
             if (id == null)
@@ -142,7 +142,7 @@ namespace WebApp.Controllers
             return View(location);
         }
 
-        // POST: Locations/Delete/5
+        // POST: LocationService/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)

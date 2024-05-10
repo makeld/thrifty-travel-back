@@ -21,14 +21,14 @@ namespace WebApp.ApiControllers
             _context = context;
         }
 
-        // GET: api/Comments
+        // GET: api/CommentService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Comment>>> GetComments()
         {
             return await _context.Comments.ToListAsync();
         }
 
-        // GET: api/Comments/5
+        // GET: api/CommentService/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Comment>> GetComment(Guid id)
         {
@@ -42,7 +42,7 @@ namespace WebApp.ApiControllers
             return comment;
         }
 
-        // PUT: api/Comments/5
+        // PUT: api/CommentService/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutComment(Guid id, Comment comment)
@@ -73,7 +73,7 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        // POST: api/Comments
+        // POST: api/CommentService
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Comment>> PostComment(Comment comment)
@@ -84,7 +84,7 @@ namespace WebApp.ApiControllers
             return CreatedAtAction("GetComment", new { id = comment.Id }, comment);
         }
 
-        // DELETE: api/Comments/5
+        // DELETE: api/CommentService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComment(Guid id)
         {

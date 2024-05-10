@@ -21,14 +21,14 @@ namespace WebApp.ApiControllers
             _context = context;
         }
 
-        // GET: api/UserExpenses
+        // GET: api/UserExpenseService
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserExpense>>> GetUserExpenses()
         {
             return await _context.UserExpenses.ToListAsync();
         }
 
-        // GET: api/UserExpenses/5
+        // GET: api/UserExpenseService/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserExpense>> GetUserExpense(Guid id)
         {
@@ -42,7 +42,7 @@ namespace WebApp.ApiControllers
             return userExpense;
         }
 
-        // PUT: api/UserExpenses/5
+        // PUT: api/UserExpenseService/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUserExpense(Guid id, UserExpense userExpense)
@@ -73,7 +73,7 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        // POST: api/UserExpenses
+        // POST: api/UserExpenseService
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<UserExpense>> PostUserExpense(UserExpense userExpense)
@@ -84,7 +84,7 @@ namespace WebApp.ApiControllers
             return CreatedAtAction("GetUserExpense", new { id = userExpense.Id }, userExpense);
         }
 
-        // DELETE: api/UserExpenses/5
+        // DELETE: api/UserExpenseService/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUserExpense(Guid id)
         {

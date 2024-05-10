@@ -18,4 +18,9 @@ public abstract class BaseBLL<TAppDbContext> : IBLL
     {
         return await UoW.SaveChangesAsync();
     }
+    
+    public int SaveChanges()
+    {
+        return UoW.SaveChanges();
+    }
 }
