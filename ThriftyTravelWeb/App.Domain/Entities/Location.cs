@@ -9,5 +9,5 @@ public class Location : BaseEntityId
 
     public string LocationName { get; set; } = default!;
 
-    public ICollection<TripLocation>? TripLocations { get; set; } = new List<TripLocation>();
+    public ICollection<TripLocation>? TripLocations { get; set; }
 }

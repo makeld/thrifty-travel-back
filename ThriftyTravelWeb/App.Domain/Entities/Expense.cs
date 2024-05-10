@@ -18,5 +18,5 @@ public class Expense : BaseEntityId
     public string CurrencyCode { get; set; } = default!;
     
     public ICollection<Photo>? Photos { get; set; }
-    public ICollection<UserExpense>? UserExpenses { get; set; } = new List<UserExpense>();
+    public ICollection<UserExpense>? UserExpenses { get; set; }
 }

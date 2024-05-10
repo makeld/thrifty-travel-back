@@ -82,7 +82,7 @@ namespace WebApp.ApiControllers
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        public async Task<IActionResult> PutTrip(Guid id, App.BLL.DTO.Trip trip)
+        public async Task<IActionResult> PutTrip(Guid id, App.DTO.v1_0.Trip trip)
         {
             if (id != trip.Id)
             {
@@ -93,8 +93,10 @@ namespace WebApp.ApiControllers
             {
                 return NotFound("The trip with the specified ID does not exist.");
             }
+            
+            var res = _mapper.Map(trip);
 
-            _bll.TripService.Update(trip);
+            _bll.TripService.Update(res);
             
             return NoContent();
         }

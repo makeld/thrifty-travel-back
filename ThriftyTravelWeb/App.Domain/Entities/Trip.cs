@@ -9,11 +9,11 @@ public class Trip : BaseEntityId
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
     
-    public ICollection<Expense>? Expenses { get; set; } = new List<Expense>();
-    public ICollection<Photo>? Photos { get; set; } = new List<Photo>();
-    public ICollection<Comment>? Comments { get; set; } = new List<Comment>();
-    public ICollection<Like>? Likes { get; set; } = new List<Like>();
-    public ICollection<TripCategory>? TripCategories { get; set; } = new List<TripCategory>();
-    public ICollection<TripLocation>? TripLocations { get; set; } = new List<TripLocation>();
-    public ICollection<TripUser>? TripUsers { get; set; } = new List<TripUser>();
+    public ICollection<Expense>? Expenses { get; set; }
+    public ICollection<Photo>? Photos { get; set; }
+    public ICollection<Comment>? Comments { get; set; }
+    public ICollection<Like>? Likes { get; set; }
+    public ICollection<TripCategory>? TripCategories { get; set; }
+    public ICollection<TripLocation>? TripLocations { get; set; }
+    public ICollection<TripUser>? TripUsers { get; set; }
 }

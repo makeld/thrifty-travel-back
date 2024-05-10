@@ -1,108 +1,165 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using System.Net;
+using App.Contracts.BLL;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using App.DAL.EF;
-using Domain.Entities;
+using AutoMapper;
+using Domain.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ExpensesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IAppBLL _bll;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly PublicDTOBllMapper<App.DTO.v1_0.Expense, App.BLL.DTO.Expense> _mapper;
 
-        public ExpensesController(AppDbContext context)
+        public ExpensesController(IAppBLL bll, UserManager<AppUser> userManager, IMapper autoMapper)
         {
-            _context = context;
+            _bll = bll;
+            _userManager = userManager;
+            _mapper = new PublicDTOBllMapper<App.DTO.v1_0.Expense, App.BLL.DTO.Expense>(autoMapper);
         }
 
-        // GET: api/ExpenseService
+        /// <summary>
+        /// Return all expenses
+        /// </summary>
+        /// <returns>List of Expenses</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Expense>>> GetExpenses()
+        [ProducesResponseType(typeof(List<App.DTO.v1_0.Expense>), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.Expense>>> GetExpenses()
         {
-            return await _context.Expenses.ToListAsync();
+            var bllResult = await _bll.ExpenseService.GetAllAsync();
+            var mapped = bllResult.Select(e => _mapper.Map(e)).ToList();
+            return Ok(mapped);
         }
 
-        // GET: api/ExpenseService/5
+        /// <summary>
+        /// Return Expense by its ID
+        /// </summary>
+        /// <param name="id">Expense ID</param>
+        /// <returns>Expense</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Expense>> GetExpense(Guid id)
+        [ProducesResponseType(typeof(App.DTO.v1_0.Expense), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Expense>> GetExpense(Guid id)
         {
-            var expense = await _context.Expenses.FindAsync(id);
+            var expense = await _bll.ExpenseService.FirstOrDefaultAsync(id);
 
             if (expense == null)
             {
                 return NotFound();
             }
 
-            return expense;
+            var res = _mapper.Map(expense);
+
+            return Ok(res);
         }
 
-        // PUT: api/ExpenseService/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
+        /// <summary>
+        /// Update Expense
+        /// </summary>
+        /// <param name="id">Expense ID</param>
+        /// <param name="expense">Expense</param>
+        /// <returns>NoContent</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutExpense(Guid id, Expense expense)
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<IActionResult> PutExpense(Guid id, App.DTO.v1_0.Expense expense)
         {
             if (id != expense.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID in the URL does not match the ID in the expense data.");
             }
 
-            _context.Entry(expense).State = EntityState.Modified;
+            if (!await _bll.ExpenseService.ExistsAsync(id))
+            {
+                return NotFound("The expense with the specified ID does not exist.");
+            }
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ExpenseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var res = _mapper.Map(expense);
+
+            _bll.ExpenseService.Update(res);
 
             return NoContent();
         }
 
-        // POST: api/ExpenseService
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Expense>> PostExpense(Expense expense)
-        {
-            _context.Expenses.Add(expense);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetExpense", new { id = expense.Id }, expense);
+        /// <summary>
+        /// Create new Expense
+        /// </summary>
+        /// <param name="expense"></param>
+        /// <returns>NoContent</returns>
+        [HttpPost]
+        [ProducesResponseType<App.DTO.v1_0.Expense>((int)HttpStatusCode.Created)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Expense>> PostExpense(App.DTO.v1_0.Expense expense)
+        {
+            var mappedExpense = _mapper.Map(expense);
+            _bll.ExpenseService.Add(mappedExpense);
+
+            return CreatedAtAction("GetExpense", new
+            {
+                version = HttpContext.GetRequestedApiVersion()?.ToString(),
+                id = expense.Id
+            }, expense);
         }
 
-        // DELETE: api/ExpenseService/5
+        /// <summary>
+        /// Delete Expense by ID
+        /// </summary>
+        /// <param name="id">Expense ID</param>
+        /// <returns>NoContent</returns>
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         public async Task<IActionResult> DeleteExpense(Guid id)
         {
-            var expense = await _context.Expenses.FindAsync(id);
+            var expense = await _bll.ExpenseService.FirstOrDefaultAsync(id);
             if (expense == null)
             {
                 return NotFound();
             }
 
-            _context.Expenses.Remove(expense);
-            await _context.SaveChangesAsync();
+            await _bll.ExpenseService.RemoveAsync(id);
 
             return NoContent();
         }
 
+
+        /// <summary>
+        /// Check if Expense exists
+        /// </summary>
+        /// <param name="id">Expense ID</param>
+        /// <returns>bool</returns>
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         private bool ExpenseExists(Guid id)
         {
-            return _context.Expenses.Any(e => e.Id == id);
+            return _bll.ExpenseService.Exists(id);
         }
     }
 }

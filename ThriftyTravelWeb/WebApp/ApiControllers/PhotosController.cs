@@ -1,108 +1,167 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using System.Net;
+using App.Contracts.BLL;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using App.DAL.EF;
-using Domain.Entities;
+using AutoMapper;
+using Domain.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PhotosController : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public PhotosController(AppDbContext context)
+        private readonly IAppBLL _bll;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly PublicDTOBllMapper<App.DTO.v1_0.Photo, App.BLL.DTO.Photo> _mapper;
+        
+        public PhotosController(IAppBLL bll, UserManager<AppUser> userManager, IMapper autoMapper)
         {
-            _context = context;
+            _bll = bll;
+            _userManager = userManager;
+            _mapper = new PublicDTOBllMapper<App.DTO.v1_0.Photo, App.BLL.DTO.Photo>(autoMapper);
         }
 
-        // GET: api/PhotoService
+        /// <summary>
+        /// Return all photos
+        /// </summary>
+        /// <returns>List of Photos</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos()
+        [ProducesResponseType(typeof(List<App.DTO.v1_0.Photo>), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.Photo>>> GetPhotos()
         {
-            return await _context.Photos.ToListAsync();
+            var bllResult = await _bll.PhotoService.GetAllAsync();
+            var mapped = bllResult.Select(e => _mapper.Map(e)).ToList();
+            return Ok(mapped);
         }
+        
 
-        // GET: api/PhotoService/5
+        /// <summary>
+        /// Return Photo by its ID
+        /// </summary>
+        /// <param name="id">Photo ID</param>
+        /// <returns>Photo</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Photo>> GetPhoto(Guid id)
+        [ProducesResponseType(typeof(App.DTO.v1_0.Photo), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Photo>> GetPhoto(Guid id)
         {
-            var photo = await _context.Photos.FindAsync(id);
+            var photo = await _bll.PhotoService.FirstOrDefaultAsync(id);
 
             if (photo == null)
             {
                 return NotFound();
             }
 
-            return photo;
+            var res = _mapper.Map(photo);
+
+            return Ok(res);
         }
 
-        // PUT: api/PhotoService/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
+        /// <summary>
+        /// Update Photo
+        /// </summary>
+        /// <param name="id">Photo ID</param>
+        /// <param name="photo">Photo</param>
+        /// <returns>NoContent</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPhoto(Guid id, Photo photo)
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<IActionResult> PutPhoto(Guid id, App.DTO.v1_0.Photo photo)
         {
             if (id != photo.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID in the URL does not match the ID in the photo data.");
             }
 
-            _context.Entry(photo).State = EntityState.Modified;
-
-            try
+            if (!await _bll.PhotoService.ExistsAsync(id))
             {
-                await _context.SaveChangesAsync();
+                return NotFound("The photo with the specified ID does not exist.");
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PhotoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            
+            var res = _mapper.Map(photo);
 
+            _bll.PhotoService.Update(res);
+            
             return NoContent();
         }
 
-        // POST: api/PhotoService
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Photo>> PostPhoto(Photo photo)
-        {
-            _context.Photos.Add(photo);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPhoto", new { id = photo.Id }, photo);
+        /// <summary>
+        /// Create new Photo
+        /// </summary>
+        /// <param name="photo"></param>
+        /// <returns>NoContent</returns>
+        [HttpPost]
+        [ProducesResponseType<App.DTO.v1_0.Photo>((int)HttpStatusCode.Created)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Photo>> PostPhoto(App.DTO.v1_0.Photo photo)
+        {
+            var mappedPhoto = _mapper.Map(photo);
+            _bll.PhotoService.Add(mappedPhoto);
+
+            return CreatedAtAction("GetPhoto", new
+            {
+                version = HttpContext.GetRequestedApiVersion()?.ToString(),
+                id = photo.Id
+            }, photo);
         }
 
-        // DELETE: api/PhotoService/5
+        /// <summary>
+        /// Delete Photo by ID
+        /// </summary>
+        /// <param name="id">Photo ID</param>
+        /// <returns>NoContent</returns>
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         public async Task<IActionResult> DeletePhoto(Guid id)
         {
-            var photo = await _context.Photos.FindAsync(id);
+            var photo = await _bll.PhotoService.FirstOrDefaultAsync(id);
+            
             if (photo == null)
             {
                 return NotFound();
             }
 
-            _context.Photos.Remove(photo);
-            await _context.SaveChangesAsync();
+            await _bll.PhotoService.RemoveAsync(id);
 
             return NoContent();
         }
 
+
+        /// <summary>
+        /// Check if Photo exists
+        /// </summary>
+        /// <param name="id">Photo ID</param>
+        /// <returns>bool</returns>
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         private bool PhotoExists(Guid id)
         {
-            return _context.Photos.Any(e => e.Id == id);
+            return _bll.PhotoService.Exists(id);
         }
     }
 }

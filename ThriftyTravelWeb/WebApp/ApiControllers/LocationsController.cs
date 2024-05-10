@@ -1,108 +1,166 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using System.Net;
+using App.Contracts.BLL;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using App.DAL.EF;
-using Domain.Entities;
+using AutoMapper;
+using Domain.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class LocationsController : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public LocationsController(AppDbContext context)
+        private readonly IAppBLL _bll;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly PublicDTOBllMapper<App.DTO.v1_0.Location, App.BLL.DTO.Location> _mapper;
+        
+        public LocationsController(IAppBLL bll, UserManager<AppUser> userManager, IMapper autoMapper)
         {
-            _context = context;
+            _bll = bll;
+            _userManager = userManager;
+            _mapper = new PublicDTOBllMapper<App.DTO.v1_0.Location, App.BLL.DTO.Location>(autoMapper);
         }
 
-        // GET: api/LocationService
+        /// <summary>
+        /// Return all locations
+        /// </summary>
+        /// <returns>List of Locations</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Location>>> GetLocations()
+        [ProducesResponseType(typeof(List<App.DTO.v1_0.Location>), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.Location>>> GetLocations()
         {
-            return await _context.Locations.ToListAsync();
+            var bllResult = await _bll.LocationService.GetAllAsync();
+            var mapped = bllResult.Select(e => _mapper.Map(e)).ToList();
+            return Ok(mapped);
         }
 
-        // GET: api/LocationService/5
+        /// <summary>
+        /// Return Location by its ID
+        /// </summary>
+        /// <param name="id">Location ID</param>
+        /// <returns>Location</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Location>> GetLocation(Guid id)
+        [ProducesResponseType(typeof(App.DTO.v1_0.Location), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Location>> GetLocation(Guid id)
         {
-            var location = await _context.Locations.FindAsync(id);
+            var location = await _bll.LocationService.FirstOrDefaultAsync(id);
 
             if (location == null)
             {
                 return NotFound();
             }
 
-            return location;
+            var res = _mapper.Map(location);
+
+            return Ok(res);
         }
 
-        // PUT: api/LocationService/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
+        /// <summary>
+        /// Update Location
+        /// </summary>
+        /// <param name="id">Location ID</param>
+        /// <param name="location">Location</param>
+        /// <returns>NoContent</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLocation(Guid id, Location location)
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<IActionResult> PutLocation(Guid id, App.DTO.v1_0.Location location)
         {
             if (id != location.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID in the URL does not match the ID in the location data.");
             }
 
-            _context.Entry(location).State = EntityState.Modified;
-
-            try
+            if (!await _bll.LocationService.ExistsAsync(id))
             {
-                await _context.SaveChangesAsync();
+                return NotFound("The location with the specified ID does not exist.");
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LocationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            
+            var res = _mapper.Map(location);
 
+            _bll.LocationService.Update(res);
+            
             return NoContent();
         }
+        
 
-        // POST: api/LocationService
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        /// <summary>
+        /// Create new Location
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns>NoContent</returns>
         [HttpPost]
-        public async Task<ActionResult<Location>> PostLocation(Location location)
+        [ProducesResponseType<App.DTO.v1_0.Location>((int)HttpStatusCode.Created)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Location>> PostLocation(App.DTO.v1_0.Location location)
         {
-            _context.Locations.Add(location);
-            await _context.SaveChangesAsync();
+            var mappedLocation = _mapper.Map(location);
+            _bll.LocationService.Add(mappedLocation);
 
-            return CreatedAtAction("GetLocation", new { id = location.Id }, location);
+            return CreatedAtAction("GetLocation", new
+            {
+                version = HttpContext.GetRequestedApiVersion()?.ToString(),
+                id = location.Id
+            }, location);
         }
 
-        // DELETE: api/LocationService/5
+        /// <summary>
+        /// Delete Location by ID
+        /// </summary>
+        /// <param name="id">Location ID</param>
+        /// <returns>NoContent</returns>
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         public async Task<IActionResult> DeleteLocation(Guid id)
         {
-            var location = await _context.Locations.FindAsync(id);
+            var location = await _bll.LocationService.FirstOrDefaultAsync(id);
+            
             if (location == null)
             {
                 return NotFound();
             }
 
-            _context.Locations.Remove(location);
-            await _context.SaveChangesAsync();
+            await _bll.LocationService.RemoveAsync(id);
 
             return NoContent();
         }
 
+
+        /// <summary>
+        /// Check if Location exists
+        /// </summary>
+        /// <param name="id">Location ID</param>
+        /// <returns>bool</returns>
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         private bool LocationExists(Guid id)
         {
-            return _context.Locations.Any(e => e.Id == id);
+            return _bll.LocationService.Exists(id);
         }
     }
 }

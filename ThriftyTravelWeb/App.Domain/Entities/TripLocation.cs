@@ -10,5 +10,5 @@ public class TripLocation : BaseEntityId
     public Guid LocationId { get; set; }
     public Location? Location { get; set; }
     
-    public ICollection<Expense>? Expenses { get; set; } = new List<Expense>();
+    public ICollection<Expense>? Expenses { get; set; }
 }

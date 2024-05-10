@@ -85,7 +85,7 @@ namespace WebApp.ApiControllers
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        public async Task<IActionResult> PutCategory(Guid id, App.BLL.DTO.Category category)
+        public async Task<IActionResult> PutCategory(Guid id, App.DTO.v1_0.Category category)
         {
             if (id != category.Id)
             {
@@ -96,8 +96,10 @@ namespace WebApp.ApiControllers
             {
                 return NotFound("The category with the specified ID does not exist.");
             }
+            
+            var res = _mapper.Map(category);
 
-            _bll.CategoryService.Update(category);
+            _bll.CategoryService.Update(res);
             
             return NoContent();
         }

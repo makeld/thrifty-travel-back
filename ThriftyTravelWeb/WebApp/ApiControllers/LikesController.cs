@@ -1,108 +1,164 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using System.Net;
+using App.Contracts.BLL;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using App.DAL.EF;
-using Domain.Entities;
+using Asp.Versioning;
+using AutoMapper;
+using Domain.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
 {
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class LikesController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IAppBLL _bll;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly PublicDTOBllMapper<App.DTO.v1_0.Like, App.BLL.DTO.Like> _mapper;
 
-        public LikesController(AppDbContext context)
+        public LikesController(IAppBLL bll, UserManager<AppUser> userManager, IMapper autoMapper)
         {
-            _context = context;
+            _bll = bll;
+            _userManager = userManager;
+            _mapper = new PublicDTOBllMapper<App.DTO.v1_0.Like, App.BLL.DTO.Like>(autoMapper);
         }
 
-        // GET: api/LikeService
+        /// <summary>
+        /// Return all likes
+        /// </summary>
+        /// <returns>List of Likes</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Like>>> GetLikes()
+        [ProducesResponseType(typeof(List<App.DTO.v1_0.Like>), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.Like>>> GetLikes()
         {
-            return await _context.Likes.ToListAsync();
+            var bllResult = await _bll.LikeService.GetAllAsync();
+            var mapped = bllResult.Select(e => _mapper.Map(e)).ToList();
+            return Ok(mapped);
         }
 
-        // GET: api/LikeService/5
+        /// <summary>
+        /// Return Like by its ID
+        /// </summary>
+        /// <param name="id">Like ID</param>
+        /// <returns>Like</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Like>> GetLike(Guid id)
+        [ProducesResponseType(typeof(App.DTO.v1_0.Like), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Like>> GetLike(Guid id)
         {
-            var like = await _context.Likes.FindAsync(id);
+            var like = await _bll.LikeService.FirstOrDefaultAsync(id);
 
             if (like == null)
             {
                 return NotFound();
             }
 
-            return like;
+            var res = _mapper.Map(like);
+
+            return Ok(res);
         }
 
-        // PUT: api/LikeService/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
+        /// <summary>
+        /// Update Like
+        /// </summary>
+        /// <param name="id">Like ID</param>
+        /// <param name="like">Like</param>
+        /// <returns>NoContent</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutLike(Guid id, Like like)
+        [ProducesResponseType((int) HttpStatusCode.NoContent)]
+        [ProducesResponseType((int) HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<IActionResult> PutLike(Guid id, App.DTO.v1_0.Like like)
         {
             if (id != like.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID in the URL does not match the ID in the like data.");
             }
 
-            _context.Entry(like).State = EntityState.Modified;
-
-            try
+            if (!await _bll.LikeService.ExistsAsync(id))
             {
-                await _context.SaveChangesAsync();
+                return NotFound("The like with the specified ID does not exist.");
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LikeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            
+            var res = _mapper.Map(like);
 
+            _bll.LikeService.Update(res);
+            
             return NoContent();
         }
 
-        // POST: api/LikeService
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        
+        /// <summary>
+        /// Create new Like
+        /// </summary>
+        /// <param name="like"></param>
+        /// <returns>NoContent</returns>
         [HttpPost]
-        public async Task<ActionResult<Like>> PostLike(Like like)
+        [ProducesResponseType<App.DTO.v1_0.Like>((int)HttpStatusCode.Created)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<App.DTO.v1_0.Like>> PostLike(App.DTO.v1_0.Like like)
         {
-            _context.Likes.Add(like);
-            await _context.SaveChangesAsync();
+            var mappedLike = _mapper.Map(like);
+            _bll.LikeService.Add(mappedLike);
 
-            return CreatedAtAction("GetLike", new { id = like.Id }, like);
+            return CreatedAtAction("GetLike", new
+            {
+                version = HttpContext.GetRequestedApiVersion()?.ToString(),
+                id = like.Id
+            }, like);
         }
 
-        // DELETE: api/LikeService/5
+        /// <summary>
+        /// Delete Like by ID
+        /// </summary>
+        /// <param name="id">Like ID</param>
+        /// <returns>NoContent</returns>
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         public async Task<IActionResult> DeleteLike(Guid id)
         {
-            var like = await _context.Likes.FindAsync(id);
+            var like = await _bll.LikeService.FirstOrDefaultAsync(id);
             if (like == null)
             {
                 return NotFound();
             }
 
-            _context.Likes.Remove(like);
-            await _context.SaveChangesAsync();
+            await _bll.LikeService.RemoveAsync(id);
 
             return NoContent();
         }
 
+
+        /// <summary>
+        /// Check if Like exists
+        /// </summary>
+        /// <param name="id">Like ID</param>
+        /// <returns>bool</returns>
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [Consumes("application/json")]
         private bool LikeExists(Guid id)
         {
-            return _context.Likes.Any(e => e.Id == id);
+            return _bll.LikeService.Exists(id);
         }
     }
 }
