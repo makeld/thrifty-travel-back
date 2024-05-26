@@ -6,7 +6,10 @@ public class Location
 {
     public Guid Id { get; set; }
     public Guid CountryId { get; set; }
+    public Country? Country { get; set; }
     
     [MaxLength(128)]
     public string LocationName { get; set; } = default!;
+    public ICollection<TripLocation>? TripLocations { get; set; }
+
 }

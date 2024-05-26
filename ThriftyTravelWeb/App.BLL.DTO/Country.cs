@@ -8,4 +8,7 @@ public class Country: IDomainEntityId
 
     public enum Name;
     public enum Continent;
+    
+    public ICollection<Location>? Locations { get; set; }
+
 }

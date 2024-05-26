@@ -6,4 +6,7 @@ public class Country
 
     public enum Name;
     public enum Continent;
+    
+    public ICollection<Location>? Locations { get; set; }
+
 }

@@ -7,8 +7,10 @@ public class Expense
     public Guid Id { get; set; }
     
     public Guid TripId { get; set; }
+    public Trip? Trip { get; set; }
     
     public Guid TripLocationId { get; set; }
+    public TripLocation? TripLocation { get; set; }
     
     [MaxLength(128)]
     public string Title { get; set; } = default!;
@@ -25,4 +27,7 @@ public class Expense
     
     [MaxLength(3)]
     public string CurrencyCode { get; set; } = default!;
+    
+    public ICollection<Photo>? Photos { get; set; }
+    public ICollection<UserExpense>? UserExpenses { get; set; }
 }
