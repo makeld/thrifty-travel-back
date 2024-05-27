@@ -46,7 +46,7 @@ public class AppUOW : BaseUnitOfWork<AppDbContext>, IAppUnitOfWork
     public IPhotoRepository PhotoRepository => _photo ?? new PhotoRepository(UowDbContext, _mapper);
 
     private ITripCategoryRepository? _tripCategory;
-    public ITripCategoryRepository TripCategoryRepository => _tripCategory ?? new TripCategoryRepository(UowDbContext, _mapper);
+    public ITripCategoryRepository TripCategoryRepository => _tripCategory ?? new TripCategoryRepository(UowDbContext, _mapper, new TripRepository(UowDbContext, _mapper));
 
     private ITripLocationRepository? _tripLocation;
     public ITripLocationRepository TripLocationRepository => _tripLocation ?? new TripLocationRepository(UowDbContext, _mapper);

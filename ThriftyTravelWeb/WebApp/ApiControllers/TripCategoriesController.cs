@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
@@ -15,7 +16,7 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TripCategoriesController : ControllerBase
     {
         private readonly IAppBLL _bll;
@@ -99,6 +100,54 @@ namespace WebApp.ApiControllers
             
             return NoContent();
         }
+        
+        /// <summary>
+        /// Get TripCategories by trip id.
+        /// </summary>
+        /// <param name="tripId"></param>
+        /// <returns>list of TripCategories.</returns>
+        [HttpGet("GetAllTripCategoriesByTripId/{tripId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.TripCategory>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.TripCategory>>> GetTripCategoryByTripId(Guid tripId)
+        {
+            var tripCategories =
+                await _bll.TripCategoryService.GetAllTripCategoriesByTripId(tripId);
+            
+            if (tripCategories.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            tripCategories =  tripCategories.ToList();
+            
+            return Ok(tripCategories);
+        }
+        
+        // /// <summary>
+        // /// Get TripCategories by category id.
+        // /// </summary>
+        // /// <param name="tripId"></param>
+        // /// <returns>list of TripCategories.</returns>
+        // [HttpGet("GetAllTripCategoriesByTripId/{tripId}")]
+        // [ProducesResponseType<List<App.DTO.v1_0.TripCategory>>((int) HttpStatusCode.OK)]
+        // [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        // [Produces("application/json")]
+        // [Consumes("application/json")]
+        // public async Task<ActionResult<List<App.DTO.v1_0.TripCategory>>> GetTripCategoryByTripId(Guid tripId)
+        // {
+        //     var tripCategories =
+        //         await _bll.TripCategoryService.GetAllTripCategoriesByTripId(tripId);
+        //     
+        //     if (tripCategories.IsNullOrEmpty())
+        //     {
+        //         return NotFound();
+        //     }
+        //     tripCategories =  tripCategories.ToList();
+        //     
+        //     return Ok(tripCategories);
+        // }
 
         
         /// <summary>

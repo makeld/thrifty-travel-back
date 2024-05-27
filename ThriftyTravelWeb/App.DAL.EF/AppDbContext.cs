@@ -1,4 +1,4 @@
-﻿using App.Domain.Identity;
+﻿using Domain.Identity;
 using Domain.Entities;
 using Domain.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -36,13 +36,17 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, Guid, IdentityUs
     {
         foreach (var entity in ChangeTracker.Entries().Where(e => e.State != EntityState.Deleted))
         {
-            foreach (var prop in entity.Properties)
+            foreach (var prop in entity
+                         .Properties
+                         .Where(x => x.Metadata.ClrType == typeof(DateTime)))
             {
-                // todo: find all datetime props, change to utc.
+                Console.WriteLine(prop);
+                prop.CurrentValue = ((DateTime) prop.CurrentValue).ToUniversalTime();
             }
         }
 
         return base.SaveChangesAsync(cancellationToken);
     }
+
 
 }

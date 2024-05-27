@@ -8,6 +8,6 @@ public class Category: IDomainEntityId
     
     public string Name { get; set; } = default!;
     
-    public ICollection<App.DAL.DTO.TripCategory>? TripCategories { get; set; }
+    // public ICollection<App.DAL.DTO.TripCategory>? TripCategories { get; set; }
 
 }

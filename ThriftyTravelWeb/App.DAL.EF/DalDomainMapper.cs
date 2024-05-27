@@ -1,4 +1,3 @@
-using App.Domain;
 using AutoMapper;
 using Base.Contracts.DAL;
 

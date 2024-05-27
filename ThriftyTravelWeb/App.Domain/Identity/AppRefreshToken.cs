@@ -1,7 +1,7 @@
 using Base.Domain;
 using Domain.Identity;
 
-namespace App.Domain.Identity;
+namespace Domain.Identity;
 
 public class AppRefreshToken : BaseRefreshToken
 {
