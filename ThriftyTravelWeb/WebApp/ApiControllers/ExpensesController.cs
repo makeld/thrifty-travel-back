@@ -8,6 +8,7 @@ using Domain.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
@@ -114,6 +115,7 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Expense>> PostExpense(App.DTO.v1_0.Expense expense)
         {
             var mappedExpense = _mapper.Map(expense);
+            mappedExpense!.Id = new Guid();
             _bll.ExpenseService.Add(mappedExpense);
 
             return CreatedAtAction("GetExpense", new
@@ -160,6 +162,30 @@ namespace WebApp.ApiControllers
         private bool ExpenseExists(Guid id)
         {
             return _bll.ExpenseService.Exists(id);
+        }
+        
+        /// <summary>
+        /// Get Expenses by trip id.
+        /// </summary>
+        /// <param name="tripId"></param>
+        /// <returns>list of Expenses.</returns>
+        [HttpGet("GetExpenseByTripId/{tripId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.Expense>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.Expense>>> GetExpenseByTripId(Guid tripId)
+        {
+            var expenses =
+                await _bll.ExpenseService.GetExpenseByTripId(tripId);
+            
+            if (expenses.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            expenses =  expenses.ToList();
+            
+            return Ok(expenses);
         }
         
         

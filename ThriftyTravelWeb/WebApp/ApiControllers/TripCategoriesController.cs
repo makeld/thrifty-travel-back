@@ -125,29 +125,29 @@ namespace WebApp.ApiControllers
             return Ok(tripCategories);
         }
         
-        // /// <summary>
-        // /// Get TripCategories by category id.
-        // /// </summary>
-        // /// <param name="tripId"></param>
-        // /// <returns>list of TripCategories.</returns>
-        // [HttpGet("GetAllTripCategoriesByTripId/{tripId}")]
-        // [ProducesResponseType<List<App.DTO.v1_0.TripCategory>>((int) HttpStatusCode.OK)]
-        // [ProducesResponseType((int) HttpStatusCode.NotFound)]
-        // [Produces("application/json")]
-        // [Consumes("application/json")]
-        // public async Task<ActionResult<List<App.DTO.v1_0.TripCategory>>> GetTripCategoryByTripId(Guid tripId)
-        // {
-        //     var tripCategories =
-        //         await _bll.TripCategoryService.GetAllTripCategoriesByTripId(tripId);
-        //     
-        //     if (tripCategories.IsNullOrEmpty())
-        //     {
-        //         return NotFound();
-        //     }
-        //     tripCategories =  tripCategories.ToList();
-        //     
-        //     return Ok(tripCategories);
-        // }
+        /// <summary>
+        /// Get TripCategories by category id.
+        /// </summary>
+        /// <param name="categoryId"></param>
+        /// <returns>list of TripCategories.</returns>
+        [HttpGet("GetAllTripCategoriesByCategoryId/{categoryId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.TripCategory>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.TripCategory>>> GetTripCategoryByCategoryId(Guid categoryId)
+        {
+            var tripCategories =
+                await _bll.TripCategoryService.GetAllTripCategoriesByCategoryId(categoryId);
+            
+            if (tripCategories.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            tripCategories =  tripCategories.ToList();
+            
+            return Ok(tripCategories);
+        }
 
         
         /// <summary>
@@ -162,6 +162,7 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.TripCategory>> PostTripCategory(App.DTO.v1_0.TripCategory tripCategory)
         {
             var mappedTripCategory = _mapper.Map(tripCategory);
+            mappedTripCategory!.Id = new Guid();
             _bll.TripCategoryService.Add(mappedTripCategory);
 
             return CreatedAtAction("GetTripCategory", new

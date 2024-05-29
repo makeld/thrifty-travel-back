@@ -8,6 +8,7 @@ using Domain.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
@@ -115,6 +116,7 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Comment>> PostComment(App.DTO.v1_0.Comment comment)
         {
             var mappedComment = _mapper.Map(comment);
+            mappedComment!.Id = new Guid();
             _bll.CommentService.Add(mappedComment);
 
             return CreatedAtAction("GetComment", new
@@ -161,6 +163,54 @@ namespace WebApp.ApiControllers
         private bool CommentExists(Guid id)
         {
             return _bll.CommentService.Exists(id);
+        }
+        
+        /// <summary>
+        /// Get Comments by trip id.
+        /// </summary>
+        /// <param name="tripId"></param>
+        /// <returns>List of Comments.</returns>
+        [HttpGet("GetAllCommentsByTripId/{tripId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.Comment>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.Comment>>> GetAllCommentsByTripId(Guid tripId)
+        {
+            var comments =
+                await _bll.CommentService.GetAllCommentsByTripId(tripId);
+
+            if (comments.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            comments = comments.ToList();
+
+            return Ok(comments);
+        }
+
+        /// <summary>
+        /// Get Comments by appUser id.
+        /// </summary>
+        /// <param name="appUserId"></param>
+        /// <returns>List of Comments.</returns>
+        [HttpGet("GetAllCommentsByAppUserId/{appUserId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.Comment>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.Comment>>> GetAllCommentsByAppUserId(Guid appUserId)
+        {
+            var photos =
+                await _bll.CommentService.GetAllCommentsByAppUserId(appUserId);
+
+            if (photos.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            photos = photos.ToList();
+
+            return Ok(photos);
         }
     }
 }

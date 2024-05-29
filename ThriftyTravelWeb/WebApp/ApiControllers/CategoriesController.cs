@@ -117,6 +117,7 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Category>> PostCategory(App.DTO.v1_0.Category category)
         {
             var mappedCategory = _mapper.Map(category);
+            mappedCategory!.Id = new Guid();
             _bll.CategoryService.Add(mappedCategory);
 
             return CreatedAtAction("GetCategory", new

@@ -8,6 +8,7 @@ using Domain.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
@@ -115,6 +116,7 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Photo>> PostPhoto(App.DTO.v1_0.Photo photo)
         {
             var mappedPhoto = _mapper.Map(photo);
+            mappedPhoto!.Id = new Guid();
             _bll.PhotoService.Add(mappedPhoto);
 
             return CreatedAtAction("GetPhoto", new
@@ -162,6 +164,54 @@ namespace WebApp.ApiControllers
         private bool PhotoExists(Guid id)
         {
             return _bll.PhotoService.Exists(id);
+        }
+        
+        /// <summary>
+        /// Get Photos by trip id.
+        /// </summary>
+        /// <param name="tripId"></param>
+        /// <returns>List of Photos.</returns>
+        [HttpGet("GetAllPhotosByTripId/{tripId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.Photo>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.Photo>>> GetAllPhotosByTripId(Guid tripId)
+        {
+            var photos =
+                await _bll.PhotoService.GetAllPhotosByTripId(tripId);
+
+            if (photos.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            photos =  photos.ToList();
+
+            return Ok(photos);
+        }
+
+        /// <summary>
+        /// Get Photos by expense id.
+        /// </summary>
+        /// <param name="expenseId"></param>
+        /// <returns>List of Photos.</returns>
+        [HttpGet("GetAllPhotosByExpenseId/{expenseId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.Photo>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.Photo>>> GetAllPhotosByExpenseId(Guid expenseId)
+        {
+            var photos =
+                await _bll.PhotoService.GetAllPhotosByExpenseId(expenseId);
+
+            if (photos.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            photos =  photos.ToList();
+
+            return Ok(photos);
         }
     }
 }

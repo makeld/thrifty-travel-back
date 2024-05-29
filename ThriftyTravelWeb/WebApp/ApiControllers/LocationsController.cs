@@ -114,6 +114,7 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Location>> PostLocation(App.DTO.v1_0.Location location)
         {
             var mappedLocation = _mapper.Map(location);
+            mappedLocation!.Id = new Guid();
             _bll.LocationService.Add(mappedLocation);
 
             return CreatedAtAction("GetLocation", new

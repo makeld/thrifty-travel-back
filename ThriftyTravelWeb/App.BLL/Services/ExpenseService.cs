@@ -1,3 +1,4 @@
+using App.BLL.DTO;
 using App.Contracts.BLL.Services;
 using App.Contracts.DAL;
 using App.Contracts.DAL.Repositories;
@@ -14,5 +15,10 @@ public class ExpenseService :
     public ExpenseService(IAppUnitOfWork uoW, IExpenseRepository repository, IMapper mapper) : base(uoW,
         repository, new BllDalMapper<App.DAL.DTO.Expense, App.BLL.DTO.Expense>(mapper))
     {
+    }
+
+    public async Task<IEnumerable<Expense?>> GetExpenseByTripId(Guid tripId)
+    {
+        return (await Repository.GetExpenseByTripId(tripId)).Select(e => Mapper.Map(e));
     }
 }

@@ -14,7 +14,7 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TripsController : ControllerBase
     {
         private readonly IAppBLL _bll;
@@ -95,7 +95,8 @@ namespace WebApp.ApiControllers
             }
             
             var res = _mapper.Map(trip);
-
+            res!.UpdatedAt = DateTime.Now;
+            
             _bll.TripService.Update(res);
             
             return NoContent();
@@ -113,12 +114,17 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Trip>> PostTrip(App.DTO.v1_0.Trip trip)
         {
             var mappedTrip = _mapper.Map(trip);
+            mappedTrip!.Id = Guid.NewGuid();
+            mappedTrip.CreatedAt = DateTime.Now;
+            mappedTrip.UpdatedAt = DateTime.Now;
+
             _bll.TripService.Add(mappedTrip);
+            await _bll.SaveChangesAsync();
 
             return CreatedAtAction("GetTrip", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = trip.Id
+                id = mappedTrip.Id
             }, trip);
         }
 

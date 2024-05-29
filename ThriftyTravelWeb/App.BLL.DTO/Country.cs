@@ -6,9 +6,7 @@ public class Country: IDomainEntityId
 {
     public Guid Id { get; set; }
 
-    public enum Name;
-    public enum Continent;
-    
-    public ICollection<Location>? Locations { get; set; }
+    public string Name { get; set; } = default!;
+    public string Continent { get; set; } = default!;
 
 }

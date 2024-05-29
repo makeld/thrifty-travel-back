@@ -1,8 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using App.BLL;
+using App.Contracts.BLL;
 using App.Contracts.DAL;
 using App.DAL.EF;
 using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Domain.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +13,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WebApp;
-using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,12 +26,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped<IAppUnitOfWork, AppUOW>();
-
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<IAppBLL, AppBLL>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-// Console.WriteLine(connectionString);
 
 builder.Services
     .AddIdentity<AppUser, AppRole>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -37,7 +36,8 @@ builder.Services
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // => remove default claims
+// clear default claims
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 builder.Services
     .AddAuthentication()
     .AddCookie(options => { options.SlidingExpiration = true; })
@@ -49,18 +49,27 @@ builder.Services
         {
             ValidIssuer = builder.Configuration.GetValue<string>("JWT:issuer"),
             ValidAudience = builder.Configuration.GetValue<string>("JWT:audience"),
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JWT:key")!)),
-            ClockSkew = TimeSpan.Zero
+            IssuerSigningKey =
+                new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(
+                        builder.Configuration.GetValue<string>("JWT:key")
+                    )
+                ),
+            ClockSkew = TimeSpan.Zero,
         };
     });
+
+
  
 builder.Services.AddControllersWithViews();
 
 var apiVersioningBuilder = builder.Services.AddApiVersioning(options =>
-{
-    options.ReportApiVersions = true;
-    options.DefaultApiVersion = new ApiVersion(1, 0);
-});
+    {
+        options.ReportApiVersions = true;
+        // in case of no explicit version
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+    }
+);
 
 apiVersioningBuilder.AddApiExplorer(options =>
 {
@@ -73,15 +82,27 @@ apiVersioningBuilder.AddApiExplorer(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
-
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsAllowAll", policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.AllowAnyOrigin();
+    });
+});
 
 builder.Services.AddAutoMapper(
     typeof(App.DAL.EF.AutoMapperProfile),
     typeof(App.BLL.AutoMapperProfile),
-    typeof(WebApp.Helpers.AutoMapperProfile));
+    typeof(WebApp.Helpers.AutoMapperProfile)
+    );
+
 
 var app = builder.Build();
 
@@ -103,10 +124,24 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseCors("CorsAllowAll");
+
 app.UseAuthorization();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>(); 
+    foreach ( var description in provider.ApiVersionDescriptions )
+    {
+        options.SwaggerEndpoint(
+            $"/swagger/{description.GroupName}/swagger.json",
+            description.GroupName.ToUpperInvariant() 
+        );
+    }
+    // serve from root
+    // options.RoutePrefix = string.Empty;
+});
 
 app.MapControllerRoute(
     name: "default",
@@ -115,7 +150,8 @@ app.MapRazorPages();
 
 app.Run();
 
-SetupAppData(app);
+
+
 
 static void SetupAppData(WebApplication app)
 {

@@ -96,6 +96,7 @@ namespace WebApp.ApiControllers
             }
             
             var res = _mapper.Map(country);
+            res!.Id = new Guid();
 
             _bll.CountryService.Update(res);
             

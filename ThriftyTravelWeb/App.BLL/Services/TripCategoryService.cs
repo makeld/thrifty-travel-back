@@ -24,6 +24,6 @@ public class TripCategoryService :
 
     public async Task<IEnumerable<App.BLL.DTO.TripCategory?>> GetAllTripCategoriesByTripId(Guid tripId)
     {
-        return (await Repository.GetAllTripCategoriesByCategoryId(tripId)).Select(e => Mapper.Map(e));
+        return (await Repository.GetAllTripCategoriesByTripId(tripId)).Select(e => Mapper.Map(e));
     }
 }

@@ -8,7 +8,4 @@ public class Category
     
     [MaxLength(128)]
     public string Name { get; set; } = default!;
-    
-    // public ICollection<TripCategory>? TripCategories { get; set; }
-
 }

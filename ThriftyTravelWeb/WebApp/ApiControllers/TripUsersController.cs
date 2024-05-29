@@ -8,6 +8,7 @@ using Domain.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
@@ -113,6 +114,7 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.TripUser>> PostTripUser(App.DTO.v1_0.TripUser tripUser)
         {
             var mappedTripUser = _mapper.Map(tripUser);
+            mappedTripUser!.Id = new Guid();
             _bll.TripUserService.Add(mappedTripUser);
 
             return CreatedAtAction("GetTripUser", new
@@ -161,6 +163,54 @@ namespace WebApp.ApiControllers
         private bool TripUserExists(Guid id)
         {
             return _bll.TripUserService.Exists(id);
+        }
+        
+        /// <summary>
+        /// Get TripUsers by appUser id.
+        /// </summary>
+        /// <param name="appUserId"></param>
+        /// <returns>list of TripUsers.</returns>
+        [HttpGet("GetAllTripUsersByAppUserId/{appUserId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.TripUser>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.TripUser>>> GetAllTripUsersByAppUserId(Guid appUserId)
+        {
+            var tripUsers =
+                await _bll.TripUserService.GetAllTripUsersByAppUserId(appUserId);
+            
+            if (tripUsers.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            tripUsers =  tripUsers.ToList();
+            
+            return Ok(tripUsers);
+        }
+        
+        /// <summary>
+        /// Get TripUsers by trip id.
+        /// </summary>
+        /// <param name="tripId"></param>
+        /// <returns>list of TripUsers.</returns>
+        [HttpGet("GetAllTripUsersByTripId/{tripId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.TripUser>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.TripUser>>> GetAllTripUsersByTripId(Guid tripId)
+        {
+            var tripUsers =
+                await _bll.TripUserService.GetAllTripUsersByTripId(tripId);
+            
+            if (tripUsers.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            tripUsers =  tripUsers.ToList();
+            
+            return Ok(tripUsers);
         }
     }
 }

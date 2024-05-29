@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using WebApp.Helpers;
 
 namespace WebApp.ApiControllers
@@ -114,6 +115,7 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.UserExpense>> PostUserExpense(App.DTO.v1_0.UserExpense userExpense)
         {
             var mappedUserExpense = _mapper.Map(userExpense);
+            mappedUserExpense!.Id = new Guid();
             _bll.UserExpenseService.Add(mappedUserExpense);
 
             return CreatedAtAction("GetUserExpense", new
@@ -162,6 +164,54 @@ namespace WebApp.ApiControllers
         private bool UserExpenseExists(Guid id)
         {
             return _bll.UserExpenseService.Exists(id);
+        }
+        
+        /// <summary>
+        /// Get UserExpenses by expense id.
+        /// </summary>
+        /// <param name="expenseId"></param>
+        /// <returns>list of UserExpenses.</returns>
+        [HttpGet("GetAllUserExpensesByExpenseId/{expenseId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.UserExpense>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.UserExpense>>> GetAllUserExpensesByExpenseId(Guid expenseId)
+        {
+            var userExpenses =
+                await _bll.UserExpenseService.GetAllUserExpensesByExpenseId(expenseId);
+            
+            if (userExpenses.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            userExpenses =  userExpenses.ToList();
+            
+            return Ok(userExpenses);
+        }
+        
+        /// <summary>
+        /// Get UserExpenses by tripUser Id.
+        /// </summary>
+        /// <param name="tripUserId"></param>
+        /// <returns>list of UserExpenses.</returns>
+        [HttpGet("GetAllUserExpensesByTripUserId/{tripUserId}")]
+        [ProducesResponseType<List<App.DTO.v1_0.UserExpense>>((int) HttpStatusCode.OK)]
+        [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<List<App.DTO.v1_0.UserExpense>>> GetAllUserExpensesByTripUserId(Guid tripUserId)
+        {
+            var userExpenses =
+                await _bll.UserExpenseService.GetAllUserExpensesByTripUserId(tripUserId);
+            
+            if (userExpenses.IsNullOrEmpty())
+            {
+                return NotFound();
+            }
+            userExpenses =  userExpenses.ToList();
+            
+            return Ok(userExpenses);
         }
     }
 }

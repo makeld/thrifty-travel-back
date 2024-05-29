@@ -7,3 +7,4 @@ public interface ITripRepository : IEntityRepository<App.DAL.DTO.Trip>
 {
     // define your DAL only custom methods here
 }
+

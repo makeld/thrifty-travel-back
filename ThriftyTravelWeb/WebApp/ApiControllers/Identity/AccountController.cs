@@ -147,8 +147,7 @@ public class AccountController : ControllerBase
         var response = new JWTResponse()
         {
             Jwt = jwt,
-            RefreshToken = refToken.RefreshToken,
-            Id = appUser.Id.ToString(),
+            RefreshToken = refToken.RefreshToken
         };
 
         return Ok(response);
@@ -319,8 +318,7 @@ public class AccountController : ControllerBase
         var response = new JWTResponse()
         {
             Jwt = generatedJwt,
-            RefreshToken = refreshToken.RefreshToken,
-            Id = id.ToString()
+            RefreshToken = refreshToken.RefreshToken
         };
 
         return Ok(response);

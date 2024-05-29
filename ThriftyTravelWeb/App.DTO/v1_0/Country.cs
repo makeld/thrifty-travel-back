@@ -4,9 +4,8 @@ public class Country
 {
     public Guid Id { get; set; }
 
-    public enum Name;
-    public enum Continent;
+    public string Name { get; set; } = default!;
     
-    public ICollection<Location>? Locations { get; set; }
-
+    public string Continent { get; set; } = default!;
+    
 }
