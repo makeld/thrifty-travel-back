@@ -114,14 +114,15 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.TripLocation>> PostTripLocation(App.DTO.v1_0.TripLocation tripLocation)
         {
             var mappedTripLocation = _mapper.Map(tripLocation);
-            mappedTripLocation!.Id = new Guid();
+            mappedTripLocation!.Id = Guid.NewGuid();
             _bll.TripLocationService.Add(mappedTripLocation);
+            await _bll.SaveChangesAsync();
 
             return CreatedAtAction("GetTripLocation", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = tripLocation.Id
-            }, tripLocation);
+                id = mappedTripLocation.Id
+            }, mappedTripLocation);
         }
 
         /// <summary>

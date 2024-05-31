@@ -15,7 +15,7 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     
     public class CountriesController : ControllerBase
     {
@@ -103,11 +103,6 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
-        /// <summary>
-        /// Create new Country
-        /// </summary>
-        /// <param name="country"></param>
-        /// <returns>NoContent</returns>
         [HttpPost]
         [ProducesResponseType<App.DTO.v1_0.Country>((int) HttpStatusCode.Created)]
         [Produces("application/json")]
@@ -115,14 +110,17 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Country>> PostCountry(App.DTO.v1_0.Country country)
         {
             var mappedCountry = _mapper.Map(country);
+            mappedCountry!.Id = Guid.NewGuid();
             _bll.CountryService.Add(mappedCountry);
+            await _bll.SaveChangesAsync();
 
             return CreatedAtAction("GetCountry", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = country.Id
-            }, country);
+                id = mappedCountry.Id
+            }, mappedCountry);
         }
+
 
         /// <summary>
         /// Delete Country by ID

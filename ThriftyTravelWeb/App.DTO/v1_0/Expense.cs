@@ -6,7 +6,6 @@ public class Expense
 {
     public Guid Id { get; set; }
     public Guid TripId { get; set; }
-    public Guid TripLocationId { get; set; }
     
     [MaxLength(128)]
     public string Title { get; set; } = default!;

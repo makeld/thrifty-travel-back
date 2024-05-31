@@ -25,4 +25,6 @@ public class TripUserService :
     {
         return (await Repository.GetAllTripUsersByTripId(tripId)).Select(e => Mapper.Map(e));
     }
+    
+    
 }

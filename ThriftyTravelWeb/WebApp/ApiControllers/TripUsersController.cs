@@ -2,11 +2,8 @@ using System.Net;
 using App.Contracts.BLL;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Domain.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using WebApp.Helpers;
@@ -16,7 +13,7 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TripUsersController : ControllerBase
     {
         private readonly IAppBLL _bll;
@@ -116,7 +113,8 @@ namespace WebApp.ApiControllers
             var mappedTripUser = _mapper.Map(tripUser);
             mappedTripUser!.Id = new Guid();
             _bll.TripUserService.Add(mappedTripUser);
-
+            _bll.SaveChangesAsync();
+        
             return CreatedAtAction("GetTripUser", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),

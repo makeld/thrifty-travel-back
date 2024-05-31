@@ -1,6 +1,6 @@
-namespace Base.Contracts.Domain;
+namespace WebApp.Models;
 
-public interface IDomainEntityMetadata
+public interface IMetaData
 {
     public DateTime CreatedAt { get; set; }
     

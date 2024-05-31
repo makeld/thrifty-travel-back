@@ -147,7 +147,10 @@ public class AccountController : ControllerBase
         var response = new JWTResponse()
         {
             Jwt = jwt,
-            RefreshToken = refToken.RefreshToken
+            RefreshToken = refToken.RefreshToken,
+            FirstName = appUser.FirstName,
+            LastName = appUser.LastName,
+            UserId = appUser.Id.ToString()
         };
 
         return Ok(response);
@@ -260,6 +263,8 @@ public class AccountController : ControllerBase
         var refreshToken = new AppRefreshToken();
         user = new AppUser()
         {
+            FirstName = registrationData.Firstname,
+            LastName = registrationData.Lastname,
             Email = registrationData.Email,
             UserName = registrationData.Email,
             RefreshTokens = new List<AppRefreshToken>()
@@ -318,7 +323,10 @@ public class AccountController : ControllerBase
         var response = new JWTResponse()
         {
             Jwt = generatedJwt,
-            RefreshToken = refreshToken.RefreshToken
+            RefreshToken = refreshToken.RefreshToken,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            UserId = id.ToString()
         };
 
         return Ok(response);
@@ -459,7 +467,10 @@ public class AccountController : ControllerBase
         var response = new JWTResponse()
         {
             Jwt = generatedJwt,
-            RefreshToken = refreshToken.RefreshToken
+            RefreshToken = refreshToken.RefreshToken,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            UserId = user.Id.ToString()
         };
         return Ok(response);
     }

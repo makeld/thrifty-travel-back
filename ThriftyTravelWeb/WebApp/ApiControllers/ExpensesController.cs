@@ -22,12 +22,14 @@ namespace WebApp.ApiControllers
         private readonly IAppBLL _bll;
         private readonly UserManager<AppUser> _userManager;
         private readonly PublicDTOBllMapper<App.DTO.v1_0.Expense, App.BLL.DTO.Expense> _mapper;
+        private readonly PublicDTOBllMapper<App.DTO.v1_0.AddExpense, App.BLL.DTO.AddExpense> _addExpenseMapper;
 
         public ExpensesController(IAppBLL bll, UserManager<AppUser> userManager, IMapper autoMapper)
         {
             _bll = bll;
             _userManager = userManager;
             _mapper = new PublicDTOBllMapper<App.DTO.v1_0.Expense, App.BLL.DTO.Expense>(autoMapper);
+            _addExpenseMapper = new PublicDTOBllMapper<App.DTO.v1_0.AddExpense, App.BLL.DTO.AddExpense>(autoMapper);
         }
 
         /// <summary>
@@ -106,23 +108,25 @@ namespace WebApp.ApiControllers
         /// <summary>
         /// Create new Expense
         /// </summary>
-        /// <param name="expense"></param>
-        /// <returns>NoContent</returns>
+        /// <param name="expenseData"></param>
+        /// <returns>Expense</returns>
         [HttpPost]
         [ProducesResponseType<App.DTO.v1_0.Expense>((int)HttpStatusCode.Created)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        public async Task<ActionResult<App.DTO.v1_0.Expense>> PostExpense(App.DTO.v1_0.Expense expense)
+        public async Task<ActionResult<App.DTO.v1_0.Expense>> PostExpense(App.DTO.v1_0.AddExpense expenseData)
         {
-            var mappedExpense = _mapper.Map(expense);
-            mappedExpense!.Id = new Guid();
-            _bll.ExpenseService.Add(mappedExpense);
-
+            var mappedExpense = _addExpenseMapper.Map(expenseData);
+            
+            var res= await _bll.ExpenseService.CreateExpenseWithAttributesAsync(mappedExpense!);
+            await _bll.SaveChangesAsync();
+            
+            var publicExpense = _mapper.Map(res);
             return CreatedAtAction("GetExpense", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = expense.Id
-            }, expense);
+                id = publicExpense!.Id
+            }, publicExpense);
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class LocationsController : ControllerBase
     {
         private readonly IAppBLL _bll;
@@ -114,15 +114,17 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Location>> PostLocation(App.DTO.v1_0.Location location)
         {
             var mappedLocation = _mapper.Map(location);
-            mappedLocation!.Id = new Guid();
+            mappedLocation!.Id = Guid.NewGuid();
             _bll.LocationService.Add(mappedLocation);
+            await _bll.SaveChangesAsync();
 
             return CreatedAtAction("GetLocation", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = location.Id
-            }, location);
+                id = mappedLocation.Id
+            }, mappedLocation);
         }
+
 
         /// <summary>
         /// Delete Location by ID

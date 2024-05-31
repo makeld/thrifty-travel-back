@@ -18,5 +18,6 @@ public class AutoMapperProfile: Profile
         CreateMap<App.BLL.DTO.TripLocation, App.DTO.v1_0.TripLocation>().ReverseMap();
         CreateMap<App.BLL.DTO.TripUser, App.DTO.v1_0.TripUser>().ReverseMap();
         CreateMap<App.BLL.DTO.UserExpense, App.DTO.v1_0.UserExpense>().ReverseMap();
+        CreateMap<App.BLL.DTO.AddExpense, App.DTO.v1_0.AddExpense>().ReverseMap();
     }
 }

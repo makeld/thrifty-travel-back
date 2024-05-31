@@ -2,12 +2,10 @@ using Domain.Base;
 
 namespace Domain.Entities;
 
-public class Trip : BaseEntityId
+public class Trip : BaseEntityIdMetadata
 {
     public string Title { get; set; } = default!;
     public string? Description { get; set; } = default!;
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
-    public DateTime UpdatedAt { get; set; } = DateTime.Now;
     
     public ICollection<Expense>? Expenses { get; set; }
     public ICollection<Photo>? Photos { get; set; }

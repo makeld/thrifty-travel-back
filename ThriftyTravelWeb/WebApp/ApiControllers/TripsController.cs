@@ -14,7 +14,6 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TripsController : ControllerBase
     {
         private readonly IAppBLL _bll;
@@ -38,6 +37,7 @@ namespace WebApp.ApiControllers
         // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<App.DTO.v1_0.Trip>>> GetTrips()
         {
             var bllTripsResult = await _bll.TripService.GetAllAsync();
@@ -55,9 +55,11 @@ namespace WebApp.ApiControllers
         // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<App.DTO.v1_0.Trip>> GetTrip(Guid id)
         {
             var trip = await _bll.TripService.FirstOrDefaultAsync(id);
+            Console.WriteLine(id);
 
             if (trip == null)
             {
@@ -82,7 +84,8 @@ namespace WebApp.ApiControllers
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        public async Task<IActionResult> PutTrip(Guid id, App.DTO.v1_0.Trip trip)
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> PutTrip(Guid id, [FromBody] App.DTO.v1_0.Trip trip)
         {
             if (id != trip.Id)
             {
@@ -93,12 +96,13 @@ namespace WebApp.ApiControllers
             {
                 return NotFound("The trip with the specified ID does not exist.");
             }
-            
+
             var res = _mapper.Map(trip);
             res!.UpdatedAt = DateTime.Now;
-            
+
             _bll.TripService.Update(res);
-            
+            await _bll.SaveChangesAsync();
+
             return NoContent();
         }
 
@@ -106,26 +110,26 @@ namespace WebApp.ApiControllers
         /// Create new Trip
         /// </summary>
         /// <param name="trip">Trip</param>
-        /// <returns>NoContent</returns>
+        /// <returns>Trip</returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         [ProducesResponseType<App.DTO.v1_0.Trip>((int) HttpStatusCode.Created)]
         [Produces("application/json")]
         [Consumes("application/json")]
         public async Task<ActionResult<App.DTO.v1_0.Trip>> PostTrip(App.DTO.v1_0.Trip trip)
         {
+            var userId = Guid.Parse(_userManager.GetUserId(User)!);
             var mappedTrip = _mapper.Map(trip);
-            mappedTrip!.Id = Guid.NewGuid();
-            mappedTrip.CreatedAt = DateTime.Now;
-            mappedTrip.UpdatedAt = DateTime.Now;
 
-            _bll.TripService.Add(mappedTrip);
+            var res= await _bll.TripService.CreateTripWithUserAsync(mappedTrip!, userId);
             await _bll.SaveChangesAsync();
 
+            var publicTrip = _mapper.Map(res);
             return CreatedAtAction("GetTrip", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = mappedTrip.Id
-            }, trip);
+                id = publicTrip!.Id
+            }, publicTrip);
         }
 
         /// <summary>
@@ -138,6 +142,7 @@ namespace WebApp.ApiControllers
         [HttpDelete("{id}")]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteTrip(Guid id)
         {
             var trip = await _bll.TripService.FirstOrDefaultAsync(id);
@@ -147,6 +152,7 @@ namespace WebApp.ApiControllers
             }
 
             await _bll.TripService.RemoveAsync(id);
+            _bll.SaveChangesAsync();
 
             return NoContent();
         }
@@ -162,6 +168,7 @@ namespace WebApp.ApiControllers
         [HttpDelete("{id}")]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         private bool TripExists(Guid id)
         {
             return _bll.TripService.Exists(id);

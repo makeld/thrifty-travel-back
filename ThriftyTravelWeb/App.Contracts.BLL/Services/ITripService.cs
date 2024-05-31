@@ -6,5 +6,6 @@ namespace App.Contracts.BLL.Services;
 
 public interface ITripService : IEntityRepository<Trip>
 {
+    Task<Trip> CreateTripWithUserAsync(Trip trip, Guid appUserId);
     
 }

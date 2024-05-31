@@ -114,14 +114,15 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Like>> PostLike(App.DTO.v1_0.Like like)
         {
             var mappedLike = _mapper.Map(like);
-            mappedLike!.Id = new Guid();
+            mappedLike!.Id = Guid.NewGuid();
             _bll.LikeService.Add(mappedLike);
+            await _bll.SaveChangesAsync();
 
             return CreatedAtAction("GetLike", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = like.Id
-            }, like);
+                id = mappedLike.Id
+            }, mappedLike);
         }
 
         /// <summary>

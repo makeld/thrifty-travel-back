@@ -45,8 +45,10 @@ builder.Services
     {
         options.RequireHttpsMetadata = false;
         options.SaveToken = false;
+        
         options.TokenValidationParameters = new TokenValidationParameters()
         {
+            
             ValidIssuer = builder.Configuration.GetValue<string>("JWT:issuer"),
             ValidAudience = builder.Configuration.GetValue<string>("JWT:audience"),
             IssuerSigningKey =
