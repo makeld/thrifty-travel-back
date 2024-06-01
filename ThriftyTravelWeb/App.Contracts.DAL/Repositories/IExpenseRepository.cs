@@ -11,5 +11,6 @@ public interface IExpenseRepository : IEntityRepository<App.DAL.DTO.Expense>, IE
 public interface IExpenseRepositoryCustom<TEntity>
 {
     Task<IEnumerable<TEntity?>> GetExpenseByTripId(Guid tripId);
+    Task<double> CalculateExpensesTotal(Guid tripId);
     
 }

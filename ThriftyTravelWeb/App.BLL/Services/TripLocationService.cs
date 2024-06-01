@@ -1,3 +1,4 @@
+using App.BLL.DTO;
 using App.Contracts.BLL.Services;
 using App.Contracts.DAL;
 using App.Contracts.DAL.Repositories;
@@ -14,5 +15,15 @@ public class TripLocationService :
     public TripLocationService(IAppUnitOfWork uoW, ITripLocationRepository repository, IMapper mapper) : base(uoW,
         repository, new BllDalMapper<App.DAL.DTO.TripLocation, App.BLL.DTO.TripLocation>(mapper))
     {
+    }
+
+    public async Task<IEnumerable<TripLocation?>> GetAllTripLocationsByLocationId(Guid locationId)
+    {
+        return (await Repository.GetAllTripLocationsByLocationId(locationId)).Select(e => Mapper.Map(e));
+    }
+
+    public async Task<IEnumerable<TripLocation?>> GetAllTripLocationsByTripId(Guid tripId)
+    {
+        return (await Repository.GetAllTripLocationsByLocationId(tripId)).Select(e => Mapper.Map(e));
     }
 }

@@ -23,13 +23,13 @@ public class AppBLL: BaseBLL<AppDbContext>, IAppBLL
     }
 
     private ITripService? _trips;
-    public ITripService TripService => _trips ?? new TripService(_uow, _uow.TripRepository, _uow.TripUserRepository, _mapper);
+    public ITripService TripService => _trips ?? new TripService(_uow, _uow.TripRepository, _uow.TripUserRepository, _uow.PhotoRepository, _uow.CategoryRepository, _uow.TripCategoryRepository, _mapper);
 
     private ICategoryService? _categories;
     public ICategoryService CategoryService => _categories ?? new CategoryService(_uow, _uow.CategoryRepository, _mapper);
     
     private IExpenseService? _expenses;
-    public IExpenseService ExpenseService => _expenses ?? new ExpenseService(_uow, _uow.ExpenseRepository, _uow.CountryRepository, _uow.LocationRepository, _uow.TripLocationRepository, _mapper);
+    public IExpenseService ExpenseService => _expenses ?? new ExpenseService(_uow, _uow.ExpenseRepository, _uow.CountryRepository, _uow.LocationRepository, _uow.TripLocationRepository, _uow.PhotoRepository, _mapper);
 
     private IEntityService<AppUser>? _users;
     public IEntityService<AppUser> AppUserService => _users ??

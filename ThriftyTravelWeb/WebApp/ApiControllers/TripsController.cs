@@ -19,12 +19,14 @@ namespace WebApp.ApiControllers
         private readonly IAppBLL _bll;
         private readonly UserManager<AppUser> _userManager;
         private readonly PublicDTOBllMapper<App.DTO.v1_0.Trip, App.BLL.DTO.Trip> _mapper;
+        private readonly PublicDTOBllMapper<App.DTO.v1_0.AddTrip, App.BLL.DTO.AddTrip> _addTripMapper;
 
         public TripsController(IAppBLL bll, UserManager<AppUser> userManager, IMapper autoMapper)
         {
             _bll = bll;
             _userManager = userManager;
             _mapper = new PublicDTOBllMapper<App.DTO.v1_0.Trip, App.BLL.DTO.Trip>(autoMapper);
+            _addTripMapper = new PublicDTOBllMapper<App.DTO.v1_0.AddTrip, App.BLL.DTO.AddTrip>(autoMapper);
         }
 
         
@@ -116,12 +118,13 @@ namespace WebApp.ApiControllers
         [ProducesResponseType<App.DTO.v1_0.Trip>((int) HttpStatusCode.Created)]
         [Produces("application/json")]
         [Consumes("application/json")]
-        public async Task<ActionResult<App.DTO.v1_0.Trip>> PostTrip(App.DTO.v1_0.Trip trip)
+        public async Task<ActionResult<App.DTO.v1_0.Trip>> PostTrip(App.DTO.v1_0.AddTrip tripData)
         {
             var userId = Guid.Parse(_userManager.GetUserId(User)!);
-            var mappedTrip = _mapper.Map(trip);
 
-            var res= await _bll.TripService.CreateTripWithUserAsync(mappedTrip!, userId);
+            var mappedData = _addTripMapper.Map(tripData);
+
+            var res= await _bll.TripService.CreateTripWithData(mappedData!, userId);
             await _bll.SaveChangesAsync();
 
             var publicTrip = _mapper.Map(res);
@@ -142,7 +145,7 @@ namespace WebApp.ApiControllers
         [HttpDelete("{id}")]
         [Produces("application/json")]
         [Consumes("application/json")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteTrip(Guid id)
         {
             var trip = await _bll.TripService.FirstOrDefaultAsync(id);
@@ -150,9 +153,39 @@ namespace WebApp.ApiControllers
             {
                 return NotFound();
             }
+            
+            var tripUsers = await _bll.TripUserService.GetAllTripUsersByTripId(id);
+            foreach (var tripUser in tripUsers)
+            {
+                await _bll.TripUserService.RemoveAsync(tripUser!.Id);
+            }
+            
+            var expenses = await _bll.ExpenseService.GetExpenseByTripId(id);
+            foreach (var expense in expenses)
+            {
+                await _bll.ExpenseService.RemoveAsync(expense!.Id);
+            }
+
+            var photos = await _bll.PhotoService.GetAllPhotosByTripId(id);
+            foreach (var photo in photos)
+            {
+                await _bll.PhotoService.RemoveAsync(photo!.Id);
+            }
+            
+            var tripCategories = await _bll.TripCategoryService.GetAllTripCategoriesByTripId(id);
+            foreach (var tripCategory in tripCategories)
+            {
+                await _bll.TripCategoryService.RemoveAsync(tripCategory!.Id);
+            }
+            
+            var tripLocations = await _bll.TripLocationService.GetAllTripLocationsByTripId(id);
+            foreach (var tripLocation in tripLocations)
+            {
+                await _bll.TripCategoryService.RemoveAsync(tripLocation!.Id);
+            }
 
             await _bll.TripService.RemoveAsync(id);
-            _bll.SaveChangesAsync();
+            await _bll.SaveChangesAsync();
 
             return NoContent();
         }

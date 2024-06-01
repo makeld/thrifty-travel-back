@@ -146,6 +146,13 @@ namespace WebApp.ApiControllers
             {
                 return NotFound();
             }
+            
+            var tripUsers = await _bll.TripUserService.GetAllTripUsersByTripId(id);
+            foreach (var tripUser in tripUsers)
+            {
+                await _bll.TripUserService.RemoveAsync(tripUser!.Id);
+            }
+
 
             await _bll.ExpenseService.RemoveAsync(id);
 
@@ -190,6 +197,30 @@ namespace WebApp.ApiControllers
             expenses =  expenses.ToList();
             
             return Ok(expenses);
+        }
+        
+        /// <summary>
+        /// Calculate the total sum of expenses in a trip.
+        /// </summary>
+        /// <param name="tripId"></param>
+        /// <returns>Total sum of expenses.</returns>
+        [HttpGet("CalculateExpensesTotal/{tripId}")]
+        [ProducesResponseType(typeof(double), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        public async Task<ActionResult<double>> CalculateExpensesTotal(Guid tripId)
+        {
+            try
+            {
+                var total = await _bll.ExpenseService.CalculateExpensesTotal(tripId);
+                Console.WriteLine(total);
+                return Ok(total);
+            }
+            catch (Exception)
+            {
+                return NotFound("Could not calculate total expenses or trip not found.");
+            }
         }
         
         

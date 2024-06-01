@@ -15,16 +15,19 @@ public class ExpenseService :
     private readonly ILocationRepository _locationRepository;
     private readonly ICountryRepository _countryRepository;
     private readonly ITripLocationRepository _tripLocationRepository;
+    private readonly IPhotoRepository _photoRepository;
     private readonly IMapper _mapper;
     private readonly IAppUnitOfWork _uow;
     
     public ExpenseService(IAppUnitOfWork uoW, IExpenseRepository repository, ICountryRepository countryRepository,  
-        ILocationRepository locationRepository, ITripLocationRepository tripLocationRepository, IMapper mapper) : base(uoW,
+        ILocationRepository locationRepository, ITripLocationRepository tripLocationRepository, 
+        IPhotoRepository photoRepository, IMapper mapper) : base(uoW,
         repository, new BllDalMapper<App.DAL.DTO.Expense, App.BLL.DTO.Expense>(mapper))
     {
         _locationRepository = locationRepository;
         _countryRepository = countryRepository;
         _tripLocationRepository = tripLocationRepository;
+        _photoRepository = photoRepository;
         _uow = uoW;
         _mapper = mapper;
     }
@@ -32,6 +35,11 @@ public class ExpenseService :
     public async Task<IEnumerable<Expense?>> GetExpenseByTripId(Guid tripId)
     {
         return (await Repository.GetExpenseByTripId(tripId)).Select(e => Mapper.Map(e));
+    }
+    
+    public async Task<double> CalculateExpensesTotal(Guid tripId)
+    {
+        return await Repository.CalculateExpensesTotal(tripId);
     }
     
     public async Task<App.BLL.DTO.Expense> CreateExpenseWithAttributesAsync(App.BLL.DTO.AddExpense expenseData)
@@ -84,6 +92,22 @@ public class ExpenseService :
             
         var createdExpense = Add(newExpense);
         await _uow.SaveChangesAsync();
+        
+        if (!string.IsNullOrEmpty(expenseData.ImageUrl))
+        {
+            var photo = new Photo()
+            {
+                Id = Guid.NewGuid(),
+                ExpenseId = createdExpense.Id,
+                ImageUrl = expenseData.ImageUrl!,
+                Description = expenseData.ImageDescription
+            };
+                
+            var dalPhoto = _mapper.Map<App.DAL.DTO.Photo>(photo);
+
+            _photoRepository.Add(dalPhoto);
+            await _uow.SaveChangesAsync();
+        }
 
         return createdExpense;
     }

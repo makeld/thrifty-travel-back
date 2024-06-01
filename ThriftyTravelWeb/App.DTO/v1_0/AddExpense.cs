@@ -32,4 +32,10 @@ public class AddExpense
     
     [MaxLength(128)]
     public string LocationName { get; set; } = default!;
+    
+    [MaxLength(256)]
+    public string? ImageUrl { get; set; } = default!;
+    
+    [MaxLength(128)]
+    public string? ImageDescription { get; set; }
 }

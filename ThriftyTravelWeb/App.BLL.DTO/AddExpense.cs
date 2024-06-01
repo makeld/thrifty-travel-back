@@ -14,4 +14,8 @@ public class AddExpense
     public string CountryContinent { get; set; } = default!;
     
     public string LocationName { get; set; } = default!;
+    
+    public string? ImageUrl { get; set; } = default!;
+    
+    public string? ImageDescription { get; set; }
 }

@@ -21,4 +21,14 @@ public class ExpenseRepository : BaseEntityRepository<AppDomain.Expense, DALDTO.
         var result = await query.ToListAsync();
         return result.Select(v => Mapper.Map(v));
     }
+    
+    public async Task<double> CalculateExpensesTotal(Guid tripId)
+    {
+        var expenses = await GetExpenseByTripId(tripId);
+        foreach (var expense in expenses)
+        {
+            Console.WriteLine("expenses: " + expense?.ExpensePrice);
+        }
+        return expenses.Sum(e => e?.ExpensePrice ?? 0);
+    }
 }
