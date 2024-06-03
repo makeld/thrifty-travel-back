@@ -100,6 +100,7 @@ namespace WebApp.ApiControllers
             var res = _mapper.Map(category);
 
             _bll.CategoryService.Update(res);
+            await _bll.SaveChangesAsync();
             
             return NoContent();
         }
@@ -117,14 +118,16 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Category>> PostCategory(App.DTO.v1_0.Category category)
         {
             var mappedCategory = _mapper.Map(category);
-            mappedCategory!.Id = new Guid();
-            _bll.CategoryService.Add(mappedCategory);
+            var res = _bll.CategoryService.Add(mappedCategory!);
+            await _bll.SaveChangesAsync();
+            
+            var publicCategory = _mapper.Map(res);
 
             return CreatedAtAction("GetCategory", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = category.Id
-            }, category);
+                id = publicCategory!.Id
+            }, publicCategory);
         }
 
         /// <summary>

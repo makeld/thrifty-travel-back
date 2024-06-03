@@ -96,9 +96,8 @@ namespace WebApp.ApiControllers
             }
             
             var res = _mapper.Map(country);
-            res!.Id = new Guid();
-
             _bll.CountryService.Update(res);
+            await _bll.SaveChangesAsync();
             
             return NoContent();
         }
@@ -114,11 +113,13 @@ namespace WebApp.ApiControllers
             _bll.CountryService.Add(mappedCountry);
             await _bll.SaveChangesAsync();
 
+            var res = _mapper.Map(mappedCountry);
+
             return CreatedAtAction("GetCountry", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = mappedCountry.Id
-            }, mappedCountry);
+                id = res!.Id
+            }, res);
         }
 
 
@@ -141,6 +142,7 @@ namespace WebApp.ApiControllers
             }
 
             await _bll.CountryService.RemoveAsync(id);
+            await _bll.SaveChangesAsync();
 
             return NoContent();
         }
