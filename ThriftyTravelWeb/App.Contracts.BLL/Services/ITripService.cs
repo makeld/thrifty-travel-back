@@ -7,5 +7,7 @@ namespace App.Contracts.BLL.Services;
 public interface ITripService : IEntityRepository<Trip>
 {
     Task<Trip> CreateTripWithData(AddTrip tripData, Guid appUserId);
+    Task UpdateTripWithData(AddTrip tripData, Guid appUserId);
+    Task<AddTrip> GetTripDataById(Guid tripId);
 
 }

@@ -48,37 +48,36 @@ namespace WebApp.ApiControllers
         }
 
         /// <summary>
-        /// Return Trip by its ID
+        /// Return Trip Data by trip's ID
         /// </summary>
         /// <param name="id">Trip ID</param>
-        /// <returns>Trip</returns>
+        /// <returns>TripData</returns>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(App.DTO.v1_0.Trip), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(App.DTO.v1_0.AddTrip), (int)HttpStatusCode.OK)]
         // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<ActionResult<App.DTO.v1_0.Trip>> GetTrip(Guid id)
+        public async Task<ActionResult<App.DTO.v1_0.AddTrip>> GetTrip(Guid id)
         {
-            var trip = await _bll.TripService.FirstOrDefaultAsync(id);
+            var tripData = await _bll.TripService.GetTripDataById(id);
             Console.WriteLine(id);
 
-            if (trip == null)
+            if (tripData == null)
             {
                 return NotFound();
             }
 
-            var res = _mapper.Map(trip);
+            var res = _addTripMapper.Map(tripData);
 
             return Ok(res);
         }
         
         
         /// <summary>
-        /// Update Trip
+        /// Update Trip, TripUser, Category, Tripcategory and Image
         /// </summary>
-        /// <param name="id">Trip ID</param>
-        /// <param name="trip">Trip</param>
+        /// <param name="tripData"></param>
         /// <returns>NoContent</returns>
         [HttpPut("{id}")]
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
@@ -87,31 +86,26 @@ namespace WebApp.ApiControllers
         [Produces("application/json")]
         [Consumes("application/json")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> PutTrip(Guid id, [FromBody] App.DTO.v1_0.Trip trip)
+        public async Task<IActionResult> PutTrip(Guid tripId, App.DTO.v1_0.AddTrip tripData)
         {
-            if (id != trip.Id)
-            {
-                return BadRequest("The ID in the URL does not match the ID in the trip data.");
-            }
+            // if (tripId != tripData.TripId)
+            // {
+            //     return BadRequest("Trip IDs in the URL don't match.");
+            // }
+            
+            var userId = Guid.Parse(_userManager.GetUserId(User)!);
+            var res = _addTripMapper.Map(tripData);
 
-            if (!await _bll.TripService.ExistsAsync(id))
-            {
-                return NotFound("The trip with the specified ID does not exist.");
-            }
-
-            var res = _mapper.Map(trip);
-            res!.UpdatedAt = DateTime.Now;
-
-            _bll.TripService.Update(res);
+            await _bll.TripService.UpdateTripWithData(res!, userId);
             await _bll.SaveChangesAsync();
 
             return NoContent();
         }
 
         /// <summary>
-        /// Create new Trip
+        /// Create new Trip, TripUser, Category, Tripcategory and Image
         /// </summary>
-        /// <param name="trip">Trip</param>
+        /// <param name="tripData">Trip Data</param>
         /// <returns>Trip</returns>
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]

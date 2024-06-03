@@ -1,14 +1,11 @@
-using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using App.DAL.EF;
 using Domain.Identity;
-using App.DTO;
 using App.DTO.v1_0;
 using App.DTO.v1_0.Identity;
 using Asp.Versioning;
-using Domain.Identity;
 using Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

@@ -95,6 +95,106 @@ namespace App.BLL.Services
 
             return createdTrip;
         }
+
+        public async Task<AddTrip> GetTripDataById(Guid tripId)
+        {
+            var trip = await Repository.FirstOrDefaultAsync(tripId);
+            if (trip == null)
+            {
+                throw new Exception("Trip not found");
+            }
+
+            var tripUsers = await _tripUserRepository.GetAllTripUsersByTripId(tripId);
+            var tripUser = tripUsers.FirstOrDefault();
+
+            var tripCategories = await _tripCategoryRepository.GetAllTripCategoriesByTripId(tripId);
+            var tripCategory = tripCategories.FirstOrDefault();
+
+            var category = await _categoryRepository.FirstOrDefaultAsync(tripCategory!.CategoryId);
+
+            var photos = await _photoRepository.GetAllPhotosByTripId(tripId);
+            var photo = photos!.FirstOrDefault() ?? null;
+
+            return new AddTrip
+            {
+                TripTitle = trip.Title,
+                TripDescription = trip.Description,
+                TripCategory = category?.Name,
+                TripId = trip.Id,
+                TripUserId = tripUser?.Id,
+                CategoryId = category?.Id,
+                TripCategoryId = tripCategory?.Id,
+                ImageId = photo?.Id,
+                ImageUrl = photo?.ImageUrl,
+                ImageDescription = photo?.Description
+            };
+        }
+
+        public async Task UpdateTripWithData(AddTrip tripData, Guid appUserId)
+        {
+            var existingTrip = await Repository.FirstOrDefaultAsync(tripData.TripId!.Value);
+            if (existingTrip == null)
+            {
+                throw new Exception("Trip not found");
+            }
+
+            existingTrip.Title = tripData.TripTitle;
+            existingTrip.Description = tripData.TripDescription;
+            existingTrip.UpdatedAt = DateTime.Now;
+            
+            Repository.Update(existingTrip);
+            await _uow.SaveChangesAsync();
+
+            var tripUser = await _tripUserRepository.FirstOrDefaultAsync(tripData.TripUserId!.Value);
+            if (tripUser != null)
+            {
+                tripUser.AppUserId = appUserId;
+                _tripUserRepository.Update(tripUser);
+                await _uow.SaveChangesAsync();
+            }
+
+            var category = await _categoryRepository.FirstOrDefaultAsync(tripData.CategoryId!.Value);
+            if (category != null)
+            {
+                category.Name = tripData.TripCategory!;
+                _categoryRepository.Update(category);
+                await _uow.SaveChangesAsync();
+            }
+
+            var tripCategory = await _tripCategoryRepository.FirstOrDefaultAsync(tripData.TripCategoryId!.Value);
+            if (tripCategory != null)
+            {
+                tripCategory.CategoryId = category!.Id;
+                _tripCategoryRepository.Update(tripCategory);
+                await _uow.SaveChangesAsync();
+            }
+
+            if (!string.IsNullOrEmpty(tripData.ImageUrl))
+            {
+                var photo = await _photoRepository.FirstOrDefaultAsync(tripData.ImageId!.Value);
+                if (photo != null)
+                {
+                    photo.ImageUrl = tripData.ImageUrl!;
+                    photo.Description = tripData.ImageDescription;
+                    _photoRepository.Update(photo);
+                    await _uow.SaveChangesAsync();
+                }
+                else
+                {
+                    var newPhoto = new Photo()
+                    {
+                        Id = Guid.NewGuid(),
+                        TripId = existingTrip.Id,
+                        ImageUrl = tripData.ImageUrl!,
+                        Description = tripData.ImageDescription
+                    };
+
+                    var dalPhoto = _mapper.Map<App.DAL.DTO.Photo>(newPhoto);
+                    _photoRepository.Add(dalPhoto);
+                    await _uow.SaveChangesAsync();
+                }
+            }
+        }
     }
 
 }
