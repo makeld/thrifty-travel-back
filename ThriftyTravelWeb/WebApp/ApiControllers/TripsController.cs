@@ -175,10 +175,11 @@ namespace WebApp.ApiControllers
             var tripLocations = await _bll.TripLocationService.GetAllTripLocationsByTripId(id);
             foreach (var tripLocation in tripLocations)
             {
-                await _bll.TripCategoryService.RemoveAsync(tripLocation!.Id);
+                await _bll.TripLocationService.RemoveAsync(tripLocation!.Id);
             }
 
             await _bll.TripService.RemoveAsync(id);
+
             await _bll.SaveChangesAsync();
 
             return NoContent();

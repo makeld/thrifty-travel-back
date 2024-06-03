@@ -16,7 +16,7 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ExpensesController : ControllerBase
     {
         private readonly IAppBLL _bll;
@@ -147,12 +147,11 @@ namespace WebApp.ApiControllers
                 return NotFound();
             }
             
-            var tripUsers = await _bll.TripUserService.GetAllTripUsersByTripId(id);
-            foreach (var tripUser in tripUsers)
+            var photos = await _bll.PhotoService.GetAllPhotosByExpenseId(id);
+            foreach (var photo in photos)
             {
-                await _bll.TripUserService.RemoveAsync(tripUser!.Id);
+                await _bll.PhotoService.RemoveAsync(photo!.Id);
             }
-
 
             await _bll.ExpenseService.RemoveAsync(id);
 

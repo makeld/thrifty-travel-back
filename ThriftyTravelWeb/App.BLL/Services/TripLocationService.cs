@@ -24,6 +24,6 @@ public class TripLocationService :
 
     public async Task<IEnumerable<TripLocation?>> GetAllTripLocationsByTripId(Guid tripId)
     {
-        return (await Repository.GetAllTripLocationsByLocationId(tripId)).Select(e => Mapper.Map(e));
+        return (await Repository.GetAllTripLocationsByTripId(tripId)).Select(e => Mapper.Map(e));
     }
 }

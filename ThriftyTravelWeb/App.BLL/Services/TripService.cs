@@ -4,7 +4,6 @@ using App.Contracts.DAL;
 using App.Contracts.DAL.Repositories;
 using AutoMapper;
 using Base.BLL;
-using Microsoft.IdentityModel.Tokens;
 
 namespace App.BLL.Services
 {
