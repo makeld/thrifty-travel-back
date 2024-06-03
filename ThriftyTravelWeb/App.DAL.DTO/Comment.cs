@@ -13,10 +13,7 @@ public class Comment: IDomainEntityId
     public Trip? Trip { get; set; }
     
     public Guid? ParentCommentId { get; set; }
-    public Comment? ParentComment { get; set; }
 
     public string Content { get; set; } = default!;
     
-    public ICollection<Comment>? ChildComments { get; set; }
-
 }

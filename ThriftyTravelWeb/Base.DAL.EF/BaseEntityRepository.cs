@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Base.Contracts.DAL;
+﻿using Base.Contracts.DAL;
 using Base.Contracts.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +28,7 @@ public class BaseEntityRepository<TKey, TDomainEntity, TDalEntity, TDbContext>
     protected readonly TDbContext RepoDbContext;
     protected readonly DbSet<TDomainEntity> RepoDbSet;
     protected readonly IDalMapper<TDomainEntity, TDalEntity> Mapper;
-    
+
     public BaseEntityRepository(TDbContext dbContext, IDalMapper<TDomainEntity, TDalEntity> mapper)
     {
         RepoDbContext = dbContext;
@@ -37,7 +36,7 @@ public class BaseEntityRepository<TKey, TDomainEntity, TDalEntity, TDbContext>
         Mapper = mapper;
     }
 
-    protected virtual IQueryable<TDomainEntity> CreateQuery(TKey? userId = default, bool noTracking = true)
+    public virtual IQueryable<TDomainEntity> CreateQuery(TKey? userId = default, bool noTracking = true)
     {
         var query = RepoDbSet.AsQueryable();
         if (userId != null && !userId.Equals(default) &&
@@ -58,97 +57,120 @@ public class BaseEntityRepository<TKey, TDomainEntity, TDalEntity, TDbContext>
 
     public virtual TDalEntity Add(TDalEntity entity)
     {
-        return Mapper.Map(RepoDbSet.Add(Mapper.Map(entity)).Entity)!;
+        return Mapper.Map(RepoDbSet.Add(Mapper.Map(entity)!).Entity)!;
     }
 
     public virtual TDalEntity Update(TDalEntity entity)
     {
-        return Mapper.Map(RepoDbSet.Update(Mapper.Map(entity)).Entity)!;
+        var entityToUpdate = RepoDbSet.Find(entity.Id);
+        if (entityToUpdate != null)
+        {
+            RepoDbContext.Entry(entityToUpdate).CurrentValues.SetValues(entity);
+            RepoDbSet.Update(entityToUpdate);
+        }
+
+        return Mapper.Map(entityToUpdate)!;
     }
 
     public virtual int Remove(TDalEntity entity, TKey? userId = default)
     {
-        if (userId == null)
+        if (userId == null || userId.Equals(Guid.Empty))
         {
-            return RepoDbSet.Where(e => e.Id.Equals(entity.Id)).ExecuteDelete();
+            var entityToDelete = RepoDbSet.Find(entity.Id);
+            RepoDbSet.Remove(entityToDelete!);
         }
-
-        return CreateQuery(userId)
-            .Where(e => e.Id.Equals(entity.Id))
-            .ExecuteDelete();
+        var entityToDel = CreateQuery(userId)
+            .FirstOrDefault(e => e.Id.Equals(entity.Id));
+        
+        var trackedEntity = RepoDbSet.Find(entityToDel!.Id);
+        RepoDbSet.Remove(trackedEntity!);
+        return RepoDbContext.SaveChanges();
     }
-
-    public virtual int Remove(TKey id, TKey userId = default)
+    
+    public virtual int Remove(TKey id, TKey? userId = default!)
     {
-        if (userId == null)
+        if (userId == null || userId!.Equals(new Guid()))
         {
-            return RepoDbSet
-                .Where(e => e.Id.Equals(id))
-                .ExecuteDelete();
+            var entity = RepoDbSet.Find(id);
+            RepoDbSet.Remove(entity!);
+            return RepoDbContext.SaveChanges();
         }
-
-        return CreateQuery(userId)
-            .Where(e => e.Id.Equals(id))
-            .ExecuteDelete();
+        var entityToDelete = CreateQuery(userId)
+            .FirstOrDefault(e => e.Id.Equals(id));
+        
+        var trackedEntity = RepoDbSet.Find(entityToDelete!.Id);
+        RepoDbSet.Remove(trackedEntity!);
+        return RepoDbContext.SaveChanges();
     }
 
 
-    public virtual IEnumerable<TDalEntity> GetAll(TKey userId = default, bool noTracking = true)
+    public virtual IEnumerable<TDalEntity> GetAll(TKey userId = default!, bool noTracking = true)
     {
-        return CreateQuery(userId, noTracking).ToList().Select(de => Mapper.Map(de));
+        return CreateQuery(userId, noTracking).ToList().Select(de => Mapper.Map(de))!;
     }
 
-    public virtual bool Exists(TKey id, TKey userId = default)
+    public virtual bool Exists(TKey id, TKey userId = default!)
     {
         return CreateQuery(userId).Any(e => e.Id.Equals(id));
     }
 
 
-    public virtual async Task<IEnumerable<TDalEntity>> GetAllAsync(TKey userId = default, bool noTracking = true)
+    public virtual async Task<IEnumerable<TDalEntity>> GetAllAsync(TKey userId = default!, bool noTracking = true)
     {
         return (await CreateQuery(userId, noTracking).ToListAsync())
-            .Select(de => Mapper.Map(de));
+            .Select(de => Mapper.Map(de))!;
     }
 
-    public virtual async Task<bool> ExistsAsync(TKey id, TKey userId = default)
+    public virtual async Task<bool> ExistsAsync(TKey id, TKey userId = default!)
     {
         return await CreateQuery(userId).AnyAsync(e => e.Id.Equals(id));
     }
 
-    public virtual async Task<int> RemoveAsync(TDalEntity entity, TKey userId = default)
+    public virtual async Task<int> RemoveAsync(TDalEntity entity, TKey? userId = default)
     {
-        if (userId == null)
+        if (userId == null || userId!.Equals(new Guid()))
         {
-            return await RepoDbSet.Where(e => e.Id.Equals(entity.Id)).ExecuteDeleteAsync();
+            var entityToUpdate = await RepoDbSet.FindAsync(entity.Id);
+            if (entityToUpdate != null)
+            {
+                RepoDbSet.Remove(entityToUpdate);
+            }
+            return await RepoDbContext.SaveChangesAsync();
         }
-
-        return await CreateQuery(userId)
-            .Where(e => e.Id.Equals(entity.Id))
-            .ExecuteDeleteAsync();
+        var entityToDel = CreateQuery(userId)
+            .FirstOrDefault(e => e.Id.Equals(entity.Id));
+        
+        var trackedEntity = await RepoDbSet.FindAsync(entityToDel!.Id);
+        RepoDbSet.Remove(trackedEntity!);
+        return await RepoDbContext.SaveChangesAsync();
     }
 
-    public virtual async Task<int> RemoveAsync(TKey id, TKey userId = default)
+    public virtual async Task<int> RemoveAsync(TKey id, TKey? userId = default)
     {
-        if (userId == null)
+        if (userId == null || userId!.Equals(new Guid()))
         {
-            return await RepoDbSet
-                .Where(e => e.Id.Equals(id))
-                .ExecuteDeleteAsync();
+            var entityToUpdate = await RepoDbSet.FindAsync(id);
+            RepoDbSet.Remove(entityToUpdate!);
+            return await RepoDbContext.SaveChangesAsync();
         }
-
-        return await CreateQuery(userId)
-            .Where(e => e.Id.Equals(id))
-            .ExecuteDeleteAsync();
+        var entityToDel = CreateQuery(userId)
+            .FirstOrDefault(e => e.Id.Equals(id));
+        var trackedEntity = await RepoDbSet.FindAsync(entityToDel!.Id);
+        RepoDbSet.Remove(trackedEntity!);
+        return await RepoDbContext.SaveChangesAsync();
     }
     
-    public TDalEntity? FirstOrDefault(TKey id, TKey userId = default, bool noTracking = true)
+    public TDalEntity? FirstOrDefault(TKey id, TKey userId = default!, bool noTracking = true)
     {
-        return Mapper.Map(CreateQuery(userId, noTracking).FirstOrDefault(m => m.Id.Equals(id)));
+        return Mapper.Map(CreateQuery(userId, noTracking).FirstOrDefault());
     }
 
-    public async Task<TDalEntity?> FirstOrDefaultAsync(TKey id, TKey userId = default, bool noTracking = true)
+    public async Task<TDalEntity?> FirstOrDefaultAsync(TKey id, TKey userId = default!, bool noTracking = true)
     {
-        return Mapper.Map(await CreateQuery(userId, noTracking).FirstOrDefaultAsync(m => m.Id.Equals(id)));
-    }
+        var query = CreateQuery(userId, noTracking);
 
+        query = query.Where(entity => entity.Id.Equals(id));
+
+        return Mapper.Map(await query.FirstOrDefaultAsync());    
+    }
 }

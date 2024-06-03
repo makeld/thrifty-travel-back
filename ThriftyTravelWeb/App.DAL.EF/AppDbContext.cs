@@ -5,8 +5,6 @@ using Domain.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using WebApp.Helpers;
-using WebApp.Models;
 
 namespace App.DAL.EF;
 
