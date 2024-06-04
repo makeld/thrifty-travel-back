@@ -36,7 +36,6 @@ namespace WebApp.ApiControllers
         /// <returns>List of Trips</returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<App.DTO.v1_0.Trip>), (int)HttpStatusCode.OK)]
-        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [AllowAnonymous]
@@ -54,7 +53,7 @@ namespace WebApp.ApiControllers
         /// <returns>TripData</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(App.DTO.v1_0.AddTrip), (int)HttpStatusCode.OK)]
-        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -93,6 +92,7 @@ namespace WebApp.ApiControllers
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -120,6 +120,7 @@ namespace WebApp.ApiControllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
         [ProducesResponseType<App.DTO.v1_0.Trip>((int) HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
         public async Task<ActionResult<App.DTO.v1_0.Trip>> PostTrip(App.DTO.v1_0.AddTrip tripData)
@@ -146,10 +147,11 @@ namespace WebApp.ApiControllers
         /// <returns>NoContent</returns>
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [HttpDelete("{id}")]
         [Produces("application/json")]
         [Consumes("application/json")]
-        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteTrip(Guid id)
         {
             var trip = await _bll.TripService.FirstOrDefaultAsync(id);

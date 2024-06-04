@@ -14,14 +14,13 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-   // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
     public class CategoriesController : ControllerBase
     {
         private readonly IAppBLL _bll;
         private readonly UserManager<AppUser> _userManager;
         private readonly PublicDTOBllMapper<App.DTO.v1_0.Category, App.BLL.DTO.Category> _mapper;
-        
         
         public CategoriesController(IAppBLL bll, UserManager<AppUser> userManager,
             IMapper autoMapper)
@@ -38,9 +37,10 @@ namespace WebApp.ApiControllers
         /// <returns>List of Categories</returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<App.DTO.v1_0.Category>), (int)HttpStatusCode.OK)]
-        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<App.DTO.v1_0.Category>>> GetCategories()
         {
             var bllCategoriesResult = await _bll.CategoryService.GetAllAsync();
@@ -56,9 +56,10 @@ namespace WebApp.ApiControllers
         /// <returns>Category</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(App.DTO.v1_0.Category), (int)HttpStatusCode.OK)]
-        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<App.DTO.v1_0.Category>> GetCategory(Guid id)
         {
             var category = await _bll.CategoryService.FirstOrDefaultAsync(id);
@@ -83,8 +84,10 @@ namespace WebApp.ApiControllers
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PutCategory(Guid id, App.DTO.v1_0.Category category)
         {
             if (id != category.Id)
@@ -113,8 +116,10 @@ namespace WebApp.ApiControllers
         /// <returns>NoContent</returns>
         [HttpPost]
         [ProducesResponseType<App.DTO.v1_0.Category>((int) HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<App.DTO.v1_0.Category>> PostCategory(App.DTO.v1_0.Category category)
         {
             var mappedCategory = _mapper.Map(category);
@@ -137,9 +142,11 @@ namespace WebApp.ApiControllers
         /// <returns>NoContent</returns>
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [HttpDelete("{id}")]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
             var category = await _bll.CategoryService.FirstOrDefaultAsync(id);
@@ -152,6 +159,5 @@ namespace WebApp.ApiControllers
 
             return NoContent();
         }
-        
     }
 }

@@ -15,7 +15,7 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     
     public class CountriesController : ControllerBase
     {
@@ -40,6 +40,7 @@ namespace WebApp.ApiControllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<List<App.DTO.v1_0.Country>>> GetCountries()
         {
             var bllResult = await _bll.CountryService.GetAllAsync();
@@ -57,6 +58,7 @@ namespace WebApp.ApiControllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<App.DTO.v1_0.Country>> GetCountry(Guid id)
         {
             var country = await _bll.CountryService.FirstOrDefaultAsync(id);
@@ -81,8 +83,10 @@ namespace WebApp.ApiControllers
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.BadRequest)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PutCountry(Guid id, App.DTO.v1_0.Country country)
         {
             if (id != country.Id)
@@ -94,9 +98,11 @@ namespace WebApp.ApiControllers
             {
                 return NotFound("The country with the specified ID does not exist.");
             }
-            
+
             var res = _mapper.Map(country);
+
             _bll.CountryService.Update(res);
+
             await _bll.SaveChangesAsync();
             
             return NoContent();
@@ -105,25 +111,25 @@ namespace WebApp.ApiControllers
         /// <summary>
         /// Create Country
         /// </summary>
-        /// <param name="country">Country</param>
-        /// <returns>Country</returns>
+        /// <param name="country"></param>
+        /// <returns></returns>
         [HttpPost]
-        [ProducesResponseType<App.DTO.v1_0.Country>((int) HttpStatusCode.Created)]
+        [ProducesResponseType<App.DTO.v1_0.Country>((int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<App.DTO.v1_0.Country>> PostCountry(App.DTO.v1_0.Country country)
         {
             var mappedCountry = _mapper.Map(country);
             _bll.CountryService.Add(mappedCountry);
             await _bll.SaveChangesAsync();
 
-            var res = _mapper.Map(mappedCountry);
-
             return CreatedAtAction("GetCountry", new
             {
                 version = HttpContext.GetRequestedApiVersion()?.ToString(),
-                id = res!.Id
-            }, res);
+                id = mappedCountry.Id
+            }, _mapper.Map(mappedCountry));
         }
 
 
@@ -134,9 +140,11 @@ namespace WebApp.ApiControllers
         /// <returns>NoContent</returns>
         [ProducesResponseType((int) HttpStatusCode.NoContent)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [HttpDelete("{id}")]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteCountry(Guid id)
         {
             var country = await _bll.CountryService.FirstOrDefaultAsync(id);
@@ -146,8 +154,9 @@ namespace WebApp.ApiControllers
             }
 
             await _bll.CountryService.RemoveAsync(id);
-            await _bll.SaveChangesAsync();
 
+            await _bll.SaveChangesAsync();
+            
             return NoContent();
         }
     }
