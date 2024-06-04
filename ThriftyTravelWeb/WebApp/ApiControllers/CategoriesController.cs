@@ -152,21 +152,6 @@ namespace WebApp.ApiControllers
 
             return NoContent();
         }
-
         
-        /// <summary>
-        /// Check if Category exists
-        /// </summary>
-        /// <param name="id">Category ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool CategoryExists(Guid id)
-        {
-            return _bll.CategoryService.Exists(id);
-        }
     }
 }

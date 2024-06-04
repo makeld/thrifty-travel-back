@@ -111,4 +111,21 @@ public class ExpenseService :
 
         return createdExpense;
     }
+    
+    public async Task<Location> GetLocationByTripLocationId(Guid tripLocationId)
+    {
+        var tripLocation = await _tripLocationRepository.FirstOrDefaultAsync(tripLocationId);
+        if (tripLocation == null)
+        {
+            throw new Exception("TripLocation not found");
+        }
+
+        var location = await _locationRepository.FirstOrDefaultAsync(tripLocation.LocationId);
+        if (location == null)
+        {
+            throw new Exception("Location not found");
+        }
+
+        return _mapper.Map<Location>(location);
+    }
 }

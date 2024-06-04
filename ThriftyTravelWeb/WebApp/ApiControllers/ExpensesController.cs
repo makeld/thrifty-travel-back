@@ -16,7 +16,7 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ExpensesController : ControllerBase
     {
         private readonly IAppBLL _bll;
@@ -157,21 +157,28 @@ namespace WebApp.ApiControllers
 
             return NoContent();
         }
-
-
+        
+        
         /// <summary>
-        /// Check if Expense exists
+        /// Get Location by TripLocation Id
         /// </summary>
-        /// <param name="id">Expense ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        /// <param name="tripLocationId"></param>
+        /// <returns></returns>
+        [HttpGet("GetLocationByTripLocationId/{tripLocationId}")]
+        [ProducesResponseType(typeof(App.DTO.v1_0.Location), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
         [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool ExpenseExists(Guid id)
+        public async Task<ActionResult<App.DTO.v1_0.Location>> GetLocationByTripLocationId(Guid tripLocationId)
         {
-            return _bll.ExpenseService.Exists(id);
+            try
+            {
+                var location = await _bll.ExpenseService.GetLocationByTripLocationId(tripLocationId);
+                return Ok(location);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
         
         /// <summary>
@@ -208,12 +215,12 @@ namespace WebApp.ApiControllers
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [Produces("application/json")]
         [Consumes("application/json")]
+        [AllowAnonymous]
         public async Task<ActionResult<double>> CalculateExpensesTotal(Guid tripId)
         {
             try
             {
                 var total = await _bll.ExpenseService.CalculateExpensesTotal(tripId);
-                Console.WriteLine(total);
                 return Ok(total);
             }
             catch (Exception)

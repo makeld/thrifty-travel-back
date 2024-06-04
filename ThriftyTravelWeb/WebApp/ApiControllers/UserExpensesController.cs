@@ -35,7 +35,7 @@ namespace WebApp.ApiControllers
         /// <returns>List of UserExpenses</returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<App.DTO.v1_0.UserExpense>), (int)HttpStatusCode.OK)]
-        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
         public async Task<ActionResult<List<App.DTO.v1_0.UserExpense>>> GetUserExpenses()
@@ -53,7 +53,7 @@ namespace WebApp.ApiControllers
         /// <returns>UserExpense</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(App.DTO.v1_0.UserExpense), (int)HttpStatusCode.OK)]
-        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
         public async Task<ActionResult<App.DTO.v1_0.UserExpense>> GetUserExpense(Guid id)
@@ -148,22 +148,6 @@ namespace WebApp.ApiControllers
             await _bll.UserExpenseService.RemoveAsync(id);
 
             return NoContent();
-        }
-
-
-        /// <summary>
-        /// Check if UserExpense exists
-        /// </summary>
-        /// <param name="id">UserExpense ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool UserExpenseExists(Guid id)
-        {
-            return _bll.UserExpenseService.Exists(id);
         }
         
         /// <summary>

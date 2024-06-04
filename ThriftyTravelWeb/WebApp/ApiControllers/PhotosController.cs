@@ -149,22 +149,6 @@ namespace WebApp.ApiControllers
 
             return NoContent();
         }
-
-
-        /// <summary>
-        /// Check if Photo exists
-        /// </summary>
-        /// <param name="id">Photo ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool PhotoExists(Guid id)
-        {
-            return _bll.PhotoService.Exists(id);
-        }
         
         /// <summary>
         /// Get Photos by trip id.

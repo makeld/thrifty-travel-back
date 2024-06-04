@@ -147,22 +147,6 @@ namespace WebApp.ApiControllers
 
             return NoContent();
         }
-
-
-        /// <summary>
-        /// Check if Like exists
-        /// </summary>
-        /// <param name="id">Like ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool LikeExists(Guid id)
-        {
-            return _bll.LikeService.Exists(id);
-        }
         
         /// <summary>
         /// Get Likes by appUser id.

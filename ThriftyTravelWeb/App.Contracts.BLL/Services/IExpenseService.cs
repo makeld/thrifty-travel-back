@@ -10,5 +10,6 @@ public interface IExpenseService : IEntityRepository<App.BLL.DTO.Expense>, IExpe
 
     Task<App.BLL.DTO.Expense> CreateExpenseWithAttributesAsync(App.BLL.DTO.AddExpense expenseData);
     Task<double> CalculateExpensesTotal(Guid tripId);
+    Task<Location> GetLocationByTripLocationId(Guid tripLocationId);
 
 }

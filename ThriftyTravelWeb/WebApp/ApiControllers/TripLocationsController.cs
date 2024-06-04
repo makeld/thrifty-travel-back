@@ -148,21 +148,6 @@ namespace WebApp.ApiControllers
 
             return NoContent();
         }
-
-
-        /// <summary>
-        /// Check if TripLocation exists
-        /// </summary>
-        /// <param name="id">TripLocation ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool TripLocationExists(Guid id)
-        {
-            return _bll.TripLocationService.Exists(id);
-        }
+        
     }
 }

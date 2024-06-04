@@ -148,22 +148,6 @@ namespace WebApp.ApiControllers
 
             return NoContent();
         }
-
-        
-        /// <summary>
-        /// Check if Comment exists
-        /// </summary>
-        /// <param name="id">Comment ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool CommentExists(Guid id)
-        {
-            return _bll.CommentService.Exists(id);
-        }
         
         /// <summary>
         /// Get Comments by trip id.

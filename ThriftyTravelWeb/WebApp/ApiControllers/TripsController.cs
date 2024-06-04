@@ -60,17 +60,27 @@ namespace WebApp.ApiControllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<ActionResult<App.DTO.v1_0.AddTrip>> GetTrip(Guid id)
         {
-            var tripData = await _bll.TripService.GetTripDataById(id);
-            Console.WriteLine(id);
-
-            if (tripData == null)
+            try
             {
-                return NotFound();
+                var tripData = await _bll.TripService.GetTripDataById(id);
+
+                if (tripData == null)
+                {
+                    return NotFound();
+                }
+
+                var res = _addTripMapper.Map(tripData);
+
+                return Ok(res);
             }
-
-            var res = _addTripMapper.Map(tripData);
-
-            return Ok(res);
+            catch (Exception ex)
+            {
+                if (ex.Message == "Trip not found")
+                {
+                    return NotFound();
+                }
+                throw;
+            }
         }
         
         
@@ -184,22 +194,6 @@ namespace WebApp.ApiControllers
 
             return NoContent();
         }
-
         
-        /// <summary>
-        /// Check if Trip exists
-        /// </summary>
-        /// <param name="id">Trip ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        private bool TripExists(Guid id)
-        {
-            return _bll.TripService.Exists(id);
-        }
     }
 }

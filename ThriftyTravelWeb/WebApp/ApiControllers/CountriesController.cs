@@ -37,7 +37,7 @@ namespace WebApp.ApiControllers
         /// <returns>List of Countries</returns>
         [HttpGet]
         [ProducesResponseType(typeof(List<App.DTO.v1_0.Country>), (int)HttpStatusCode.OK)]
-        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
         public async Task<ActionResult<List<App.DTO.v1_0.Country>>> GetCountries()
@@ -54,7 +54,7 @@ namespace WebApp.ApiControllers
         /// <returns>Country</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(App.DTO.v1_0.Country), (int)HttpStatusCode.OK)]
-        // [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [Produces("application/json")]
         [Consumes("application/json")]
         public async Task<ActionResult<App.DTO.v1_0.Country>> GetCountry(Guid id)
@@ -102,6 +102,11 @@ namespace WebApp.ApiControllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Create Country
+        /// </summary>
+        /// <param name="country">Country</param>
+        /// <returns>Country</returns>
         [HttpPost]
         [ProducesResponseType<App.DTO.v1_0.Country>((int) HttpStatusCode.Created)]
         [Produces("application/json")]
@@ -109,7 +114,6 @@ namespace WebApp.ApiControllers
         public async Task<ActionResult<App.DTO.v1_0.Country>> PostCountry(App.DTO.v1_0.Country country)
         {
             var mappedCountry = _mapper.Map(country);
-            mappedCountry!.Id = Guid.NewGuid();
             _bll.CountryService.Add(mappedCountry);
             await _bll.SaveChangesAsync();
 
@@ -145,22 +149,6 @@ namespace WebApp.ApiControllers
             await _bll.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        
-        /// <summary>
-        /// Check if Country exists
-        /// </summary>
-        /// <param name="id">Country ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int) HttpStatusCode.NoContent)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool CountryExists(Guid id)
-        {
-            return _bll.CountryService.Exists(id);
         }
     }
 }

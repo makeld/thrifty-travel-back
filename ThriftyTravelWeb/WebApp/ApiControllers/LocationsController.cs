@@ -149,21 +149,5 @@ namespace WebApp.ApiControllers
 
             return NoContent();
         }
-
-
-        /// <summary>
-        /// Check if Location exists
-        /// </summary>
-        /// <param name="id">Location ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool LocationExists(Guid id)
-        {
-            return _bll.LocationService.Exists(id);
-        }
     }
 }

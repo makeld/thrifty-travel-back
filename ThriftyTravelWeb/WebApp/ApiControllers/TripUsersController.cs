@@ -4,6 +4,8 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Domain.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using WebApp.Helpers;
@@ -13,7 +15,7 @@ namespace WebApp.ApiControllers
     [ApiVersion("1.0")]
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TripUsersController : ControllerBase
     {
         private readonly IAppBLL _bll;
@@ -145,22 +147,6 @@ namespace WebApp.ApiControllers
             await _bll.TripUserService.RemoveAsync(id);
 
             return NoContent();
-        }
-
-
-        /// <summary>
-        /// Check if TripUser exists
-        /// </summary>
-        /// <param name="id">TripUser ID</param>
-        /// <returns>bool</returns>
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [HttpDelete("{id}")]
-        [Produces("application/json")]
-        [Consumes("application/json")]
-        private bool TripUserExists(Guid id)
-        {
-            return _bll.TripUserService.Exists(id);
         }
         
         /// <summary>

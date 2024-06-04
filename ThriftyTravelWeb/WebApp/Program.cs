@@ -199,3 +199,9 @@ static void SetupAppData(WebApplication app)
         Console.WriteLine(res.ToString());
     }
 }
+
+// needed for unit testing, to change generated top level statement class to public
+public partial class Program
+{
+    
+}
