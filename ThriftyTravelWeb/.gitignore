@@ -1,13 +1,9 @@
-# Common IntelliJ Platform excludes
-
-# User specific
 **/.idea/**/workspace.xml
 **/.idea/**/tasks.xml
 **/.idea/shelf/*
 **/.idea/dictionaries
 **/.idea/httpRequests/
 
-# Sensitive or high-churn files
 **/.idea/**/dataSources/
 **/.idea/**/dataSources.ids
 **/.idea/**/dataSources.xml
@@ -15,8 +11,6 @@
 **/.idea/**/sqlDataSources.xml
 **/.idea/**/dynamic.xml
 
-# Rider
-# Rider auto-generates .iml files, and contentModel.xml
 **/.idea/**/*.iml
 **/.idea/**/contentModel.xml
 **/.idea/**/modules.xml
@@ -33,27 +27,40 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
-
-# office
-
-*.tmp
-
-# Word temporary
-~$*.doc*
-
-# Word Auto Backup File
-Backup of *.doc*
-
-# Excel temporary
-~$*.xls*
-
-# Excel Backup File
-*.xlk
-
-# PowerPoint temporary
-~$*.ppt*
-
-# Visio autosave temporary files
 *.~vsd*
 
+docker-compose.override.yml
+docker-compose*.yml
+*.env
+.env.*
+**/docker-data/
+Dockerfile*
+**/docker-compose/
+
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+node_modules/
+
+dist/
+build/
+
+coverage/
+
+*.swp
+*.tmp
+*.pid
+*.seed
+*.bak
+*.log
+
+*.gz
+*.sql
+*.tar
+*.zip
+
+appsettings.json
+appsettings*.json
 

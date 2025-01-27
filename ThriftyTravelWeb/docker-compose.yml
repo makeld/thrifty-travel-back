@@ -12,9 +12,24 @@ services:
       - POSTGRES_USER=postgres
     restart: on-failure
     logging:
-      options: 
+      options:
         max-size: 10m
         max-file: 3
-        
+  
+  app:
+    build: ./
+    container_name: ThriftyTravelWeb-app
+    ports:
+      - 8080:8080
+    restart: on-failure
+    logging:
+      options:
+        max-size: 10m
+        max-file: 3
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=ThriftyTravelWeb-sql;Port=5432;Database=ThriftyTravel;Username=postgres;Password=postgres"
+    depends_on:
+      - sql
+
 volumes:
   sql-volume:

@@ -1,44 +1,37 @@
-Name: Marie Keldrima
-Uni-ID: makeld
-Student ID: 223191 IADB
+# Travel Expense Tracker (In Development)
 
-----------------------------------------------------------------------------------------
+Welcome to the **Travel Expense Tracker** project! This application is being developed to simplify travel expense management and enhance trip planning with valuable user-contributed insights.
 
+## Overview
 
-# MVC WEB
-~~~bash
-dotnet tool update -g dotnet-ef
-dotnet tool update -g dotnet-aspnet-codegenerator
+Tracking travel expenses can be tedious and frustrating, especially when managing costs for group trips or trying to keep a detailed record. Additionally, valuable knowledge from travelers' experiences often goes underutilized. The Travel Expense Tracker is designed to address these challenges by providing:
 
-dotnet ef migrations --project App.DAL.EF --startup-project WebApp add Initial
-dotnet ef database --project App.DAL.EF --startup-project WebApp update
+- **Seamless expense tracking**: Log and categorize expenses for transportation, accommodation, dining, activities, and more.
+- **Group expense management**: Easily track and split costs among friends or family for shared trips.
+- **Travel journaling**: Add photos and descriptions to expense entries to create a comprehensive travel log.
+- **Travel inspiration and budget planning**: Explore user-contributed trip insights based on travel types or destinations to help plan your next adventure.
 
-dotnet aspnet-codegenerator controller -name TripsController -actions -m Domain.Entities.Trip -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name CategoriesController -actions -m Domain.Entities.Category -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name CommentsController -actions -m Domain.Entities.Comment -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name CountriesController -actions -m Domain.Entities.Country -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name ExpensesController -actions -m Domain.Entities.Expense -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name LikesController -actions -m Domain.Entities.Like -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name LocationsController -actions -m Domain.Entities.Location -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name PhotosController -actions -m Domain.Entities.Photo -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name TripCategoriesController -actions -m Domain.Entities.TripCategory -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name TripLocationsController -actions -m Domain.Entities.TripLocation -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name TripUsersController -actions -m Domain.Entities.TripUser -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-dotnet aspnet-codegenerator controller -name UserExpensesController -actions -m Domain.Entities.UserExpense -dc AppDbContext -outDir Controllers --useDefaultLayout --useAsyncActions --referenceScriptLibraries -f
-~~~
+## Key Features
 
-# API
-~~~bash
-dotnet aspnet-codegenerator controller -name TripsController  -m  Domain.Entities.Trip       -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name CategoriesController  -m  Domain.Entities.Category       -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name CommentsController  -m  Domain.Entities.Comment       -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name CountriesController  -m  Domain.Entities.Country         -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name ExpensesController  -m  Domain.Entities.Expense       -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name LikesController  -m  Domain.Entities.Like       -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name LocationsController  -m  Domain.Entities.Location       -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name PhotosController  -m  Domain.Entities.Photo       -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name TripCategoriesController  -m  Domain.Entities.TripCategory       -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name TripLocationsController  -m  Domain.Entities.TripLocation       -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name TripUsersController  -m  Domain.Entities.TripUser        -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-dotnet aspnet-codegenerator controller -name UserExpensesController  -m  Domain.Entities.UserExpense        -dc AppDbContext -outDir ApiControllers -api --useAsyncActions -f
-~~~
+1. **Expense Tracking**:
+    - Intuitive interface for adding and categorizing expenses.
+    - Attach photos and notes for a detailed log.
+    - Track individual or group expenses effortlessly.
+
+2. **Group Expense Support**:
+    - Collaborate with fellow travelers to track shared costs.
+    - Simplifies group budgeting and accountability.
+
+3. **Travel Insights**:
+    - Browse trips shared by other users.
+    - Filter by travel type (e.g., backpacking, culinary trips) or destination.
+    - Gain insights into expected expenses and budget considerations.
+
+4. **Personalized Travel Logs**:
+    - Capture and save memorable details of your trips.
+    - Build a personal archive of travel experiences.
+
+## Status
+
+The Travel Expense Tracker is currently in development. Key features are being implemented and tested to ensure a seamless user experience. 
+

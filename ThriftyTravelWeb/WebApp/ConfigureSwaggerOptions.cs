@@ -15,7 +15,6 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 
     public void Configure(SwaggerGenOptions options)
     {
-        // add all possible api versions found
         foreach (var description in _provider.ApiVersionDescriptions)
         {
             options.SwaggerDoc(
@@ -24,7 +23,6 @@ public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
                 {
                     Title = $"API {description.ApiVersion}",
                     Version = description.ApiVersion.ToString()
-                    // Description, TermsOfServce, Contact, License, ...
                 });
         }
         
